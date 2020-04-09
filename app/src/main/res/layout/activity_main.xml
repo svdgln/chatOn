@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <include
+        android:id="@+id/main_page_toolbar"
+        layout="@layout/app_bar_layout">
+    </include>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/chat_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHAT"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:layout_alignParentLeft="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton">
+        </Button>
+
+        <Button
+            android:id="@+id/group_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GROUP"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:layout_centerInParent="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton">
+
+        </Button>
+
+        <Button
+            android:id="@+id/contact_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CONTACT"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:layout_alignParentRight="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton">
+
+        </Button>
+
+    </LinearLayout>
+
+
+    <ScrollView android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
+
+        <FrameLayout
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </FrameLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>
