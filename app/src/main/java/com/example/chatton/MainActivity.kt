@@ -18,7 +18,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-   private val currentUser = FirebaseAuth.getInstance().currentUser
+    private var currentUser = FirebaseAuth.getInstance().currentUser
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +29,9 @@ class MainActivity : AppCompatActivity() {
         val chat_buton = findViewById<Button>(R.id.chat_buton)
         val group_buton = findViewById<Button>(R.id.group_buton)
         val contact_buton = findViewById<Button>(R.id.contact_buton)
+
+        auth = FirebaseAuth.getInstance()
+        currentUser = auth.currentUser
 
         //FRAGMENT PART
         val fragmentTransaction = supportFragmentManager.beginTransaction()
