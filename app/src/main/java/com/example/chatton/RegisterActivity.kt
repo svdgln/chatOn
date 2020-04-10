@@ -21,12 +21,12 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-            //val register_mail = findViewById<EditText>(R.id.register_mail)
-            //val register_password = findViewById<EditText>(R.id.register_password)
-            val register_buton = findViewById<Button>(R.id.register_buton)
-            val have_account = findViewById<TextView>(R.id.have_account)
+        //val register_mail = findViewById<EditText>(R.id.register_mail)
+        //val register_password = findViewById<EditText>(R.id.register_password)
+        val register_buton = findViewById<Button>(R.id.register_buton)
+        val have_account = findViewById<TextView>(R.id.have_account)
 
-            auth = FirebaseAuth.getInstance()
+        auth = FirebaseAuth.getInstance()
 
         have_account.setOnClickListener{
             val intent = Intent(this, LoginActivity::class.java)
@@ -51,18 +51,18 @@ class RegisterActivity : AppCompatActivity() {
             toast.show()
         }
         else{
-                auth.createUserWithEmailAndPassword(mail,password).addOnCompleteListener ( this, OnCompleteListener<AuthResult> { task ->
-                    if (task.isSuccessful) {
-                        val intent = Intent(this, LoginActivity::class.java)
-                        startActivity(intent)
-                        val toast = Toast.makeText(applicationContext, "Account Created Successfully ", Toast.LENGTH_LONG)
-                        toast.show()
-                    } else {
-                        val massege = task.exception.toString()
-                        val toast = Toast.makeText(applicationContext, "Error: " + massege, Toast.LENGTH_LONG)
-                        toast.show()
-                    }
-                })
+            auth.createUserWithEmailAndPassword(mail,password).addOnCompleteListener ( this, OnCompleteListener<AuthResult> { task ->
+                if (task.isSuccessful) {
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                    val toast = Toast.makeText(applicationContext, "Account Created Successfully ", Toast.LENGTH_LONG)
+                    toast.show()
+                } else {
+                    val massege = task.exception.toString()
+                    val toast = Toast.makeText(applicationContext, "Error: " + massege, Toast.LENGTH_LONG)
+                    toast.show()
+                }
+            })
         }
     }
 }
