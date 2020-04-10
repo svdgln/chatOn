@@ -10,6 +10,13 @@
 
     </item>
     <item
+        android:title="Create Group"
+        android:id="@+id/main_group"
+        android:icon="@drawable/ic_lock_black_24dp"
+        app:showAsAction="never">
+
+    </item>
+    <item
         android:title="Settings"
         android:id="@+id/main_settings"
         android:icon="@drawable/ic_lock_black_24dp"

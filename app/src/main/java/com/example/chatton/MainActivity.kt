@@ -1,37 +1,33 @@
 package com.example.chatton
 
-import android.R.id
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+
 import android.widget.Button
-import android.widget.TextView
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
-import com.google.android.material.tabs.TabItem
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.firebase.database.*
 
 
 class MainActivity : AppCompatActivity() {
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth
-
+    private lateinit var RootRef: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         //DEFINE VARIABLE
         val chat_buton = findViewById<Button>(R.id.chat_buton)
         val group_buton = findViewById<Button>(R.id.group_buton)
@@ -40,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         currentUser = auth.currentUser
-
+        RootRef = FirebaseDatabase.getInstance().reference
 
         //FRAGMENT PART
         val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -70,6 +66,26 @@ class MainActivity : AppCompatActivity() {
         if (currentUser == null) {
             sendUserToLoginActivity();
         }
+        else {
+            VeryUserExistance()
+        }
+    }
+
+    private fun VeryUserExistance() {
+        val currentuserID = auth.currentUser?.uid
+        if (currentuserID != null) {
+            RootRef.child(currentuserID).addValueEventListener(object: ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.child("name").exists()) {
+                        val toast = Toast.makeText(applicationContext, " ", Toast.LENGTH_LONG)
+                        toast.show()
+                    }
+
+                }override fun onCancelled(error: DatabaseError) {
+                    //print error.message
+                }
+            })
+        }
     }
 
 
@@ -96,8 +112,42 @@ class MainActivity : AppCompatActivity() {
                 sendUserToProfileActivity()
                 return true
             }
+            R.id.main_group -> {
+                requestNewGroup()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun requestNewGroup() {
+        val alert = AlertDialog.Builder(this)
+        alert.setTitle("Enter Group Name: ")
+        val groupNameField = EditText(this)
+        groupNameField.setHint("e.g Cofing Cafe")
+        alert.setView(groupNameField)
+        alert.setPositiveButton("Create") { dialogInterface: DialogInterface, i: Int ->
+            val groupName = groupNameField.text.toString()
+            if (TextUtils.isEmpty(groupName)) {
+                Toast.makeText(applicationContext, "Please Write Group Name", Toast.LENGTH_LONG).show()
+            } else{
+                CreateNewGroup(groupName)
+            }
+        }
+        alert.setNegativeButton("Cancel") {dialogInterface: DialogInterface, i: Int ->
+            dialogInterface.cancel()}
+        alert.show()
+    }
+
+    private fun CreateNewGroup(groupName: String) {
+        RootRef.child("Group").child(groupName).setValue("").addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(applicationContext, groupName + " is created.", Toast.LENGTH_LONG).show()
+            } else {
+            }
+        }
+            
+
     }
 
     private fun sendUserToLoginActivity() {
@@ -108,7 +158,12 @@ class MainActivity : AppCompatActivity() {
         val profileIntent = Intent(this, ProfileActivity::class.java)
         startActivity(profileIntent)
     }
-
+    private fun sendUserToSettingsActivity() {
+        val profileIntent = Intent(this, SettingsActivity::class.java)
+        startActivity(profileIntent)
+    }
 
 
 }
+
+
