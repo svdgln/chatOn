@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "950579088852",
+    "firebase_url": "https://chattondatabase.firebaseio.com",
+    "project_id": "chattondatabase",
+    "storage_bucket": "chattondatabase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:950579088852:android:c279c57bbf9e4ea4ad5a41",
+        "android_client_info": {
+          "package_name": "com.example.chatton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "950579088852-bjqjon7dqiqhohqv1v7ntib5qii70i90.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGH02K5XcXf5spe-s0Ieh1jU2pfXXL848"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "950579088852-bjqjon7dqiqhohqv1v7ntib5qii70i90.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
