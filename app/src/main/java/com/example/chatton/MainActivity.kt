@@ -72,10 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendUserToLoginActivity() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu_options, menu)
@@ -95,8 +92,21 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+            R.id.main_profile -> {
+                sendUserToProfileActivity()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun sendUserToLoginActivity() {
+        val loginIntent = Intent(this, LoginActivity::class.java)
+        startActivity(loginIntent)
+    }
+    private fun sendUserToProfileActivity() {
+        val profileIntent = Intent(this, ProfileActivity::class.java)
+        startActivity(profileIntent)
     }
 
 
