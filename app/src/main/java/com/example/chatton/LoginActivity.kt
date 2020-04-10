@@ -58,9 +58,12 @@ class LoginActivity : AppCompatActivity() {
                     val toast = Toast.makeText(applicationContext, "Logged in Successfully ", Toast.LENGTH_LONG)
                     toast.show()
                 } else {
-                    val massege = task.exception.toString()
-                    val toast = Toast.makeText(applicationContext, "Error: " + massege, Toast.LENGTH_LONG)
-                    toast.show()
+                    val errmessage = task.exception.toString()
+                    val toastnotmember = Toast.makeText(applicationContext, "Please Create an Account " , Toast.LENGTH_LONG)
+                    toastnotmember.show()
+
+                    // val toast = Toast.makeText(applicationContext, "ErrorVar: " + errmessage, Toast.LENGTH_LONG)
+                    // toast.show()
                 }
             })
         }

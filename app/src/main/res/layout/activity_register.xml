@@ -33,37 +33,43 @@
         android:layout_marginRight="17dp">
 
     </EditText>
+
     <EditText
         android:id="@+id/register_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/register_mail"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/register_mail"
+        android:layout_marginLeft="17dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="17dp"
+        android:drawableStart="@drawable/ic_lock_black_24dp"
+        android:drawableLeft="@drawable/ic_lock_black_24dp"
         android:hint="Password..."
         android:inputType="textPassword"
         android:padding="4dp"
-        android:drawableStart="@drawable/ic_lock_black_24dp"
-        android:drawableLeft="@drawable/ic_lock_black_24dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp">
+        android:textColorHighlight="#378CCD"
+        android:textColorLink="#378CCD">
 
     </EditText>
+
     <Button
         android:id="@+id/register_buton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/register_password"
-        android:padding="4dp"
-        android:layout_marginTop="10dp"
         android:layout_marginLeft="17dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="17dp"
+        android:background="@drawable/rounded_btn"
+        android:padding="4dp"
         android:text="Create Account"
         android:textAllCaps="false"
-        android:textSize="24sp"
-        android:background="@drawable/rounded_btn"
-        android:textColor="@color/color_white">
+        android:textColor="@color/color_white"
+        android:textColorHighlight="#378CCD"
+        android:textColorLink="#378CCD"
+        android:textSize="24sp">
 
     </Button>
     <TextView
