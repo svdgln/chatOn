@@ -61,20 +61,23 @@
                 android:layout_marginRight="17dp">
 
             </EditText>
+
             <Button
                 android:id="@+id/login_buton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/login_password"
-                android:padding="4dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginLeft="17dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="17dp"
+                android:background="@drawable/rounded_btn"
+                android:padding="4dp"
                 android:text="Login"
                 android:textAllCaps="false"
+                android:textColor="@color/color_white"
                 android:textSize="24sp"
-                android:background="@color/colorPrimary"
-                android:textColor="@color/color_white">
+                >
+
 
             </Button>
             <TextView
@@ -86,9 +89,10 @@
                 android:layout_below="@id/login_buton"
                 android:text="New Account ? "
                 android:layout_marginTop="2dp"
+                android:background="@drawable/rounded_white_btn"
                 android:layout_marginLeft="15dp"
                 android:layout_marginRight="23dp"
-                android:textSize="23sp"
+                android:textSize="21sp"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold">
 
