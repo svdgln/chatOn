@@ -61,7 +61,6 @@ dependencies {
     implementation 'com.android.support:design:29.0.0-rc01'
     implementation 'com.google.android.material:material:version'
 
-    //Firebase
-    //classpath 'com.google.gms:google-services:4.3.3'
-    //implementation 'com.google.firebase:firebase-analytics:17.2.2'
+    //Circle
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 }
