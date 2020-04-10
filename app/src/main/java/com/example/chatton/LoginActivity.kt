@@ -36,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
             AllowUserToLogin()
         }
     }
+
     private fun AllowUserToLogin() {
         val mail = login_mail.text.toString()
         val password = login_password.text.toString()

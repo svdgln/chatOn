@@ -9,10 +9,21 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <include
-        android:id="@+id/main_page_toolbar"
-        layout="@layout/app_bar_layout">
-    </include>
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:theme="@style/AppTheme">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary">
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 
     <LinearLayout
