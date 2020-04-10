@@ -62,7 +62,7 @@
         android:text="Create Account"
         android:textAllCaps="false"
         android:textSize="24sp"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/rounded_btn"
         android:textColor="@color/color_white">
 
     </Button>
@@ -73,11 +73,12 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:layout_below="@id/register_buton"
+        android:background="@drawable/rounded_white_btn"
         android:text="Already Have An Account ? "
         android:layout_marginTop="2dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="23dp"
-        android:textSize="23sp"
+        android:textSize="18sp"
         android:textColor="@color/colorPrimary"
         android:textStyle="bold">
 
