@@ -14,10 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
+        android:padding="10dp"
         android:textSize="17sp"
         android:textStyle="bold"
-        android:text="ONLINE CHAT"
+        android:text="ChattOn"
         android:textColor="@color/color_white">
     </TextView>
 
