@@ -68,7 +68,7 @@
         android:textAlignment="center"
         android:gravity="center"
         android:textColor="@color/cardview_light_background"
-        android:background="@color/colorPrimaryDark"
+        android:background="@drawable/rounded_btn"
         android:textStyle="bold"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
