@@ -82,6 +82,7 @@ class ProfileActivity : AppCompatActivity() {
                     when {
                         task.isSuccessful -> {
                             val intent = Intent(this, MainActivity::class.java)
+                            //TODO: Can be redirected to ProfileActivity. But bug appears while pressed back button.
                             startActivity(intent)
                             val toast = Toast.makeText(applicationContext, "Profile Updated Successfully ", Toast.LENGTH_LONG)
                             toast.show()
