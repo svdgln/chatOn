@@ -1,22 +1,38 @@
 package com.example.chatton
 
+import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Button
-import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.UploadTask
+import com.squareup.picasso.Picasso
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_profile.*
 
+
+@Suppress("DEPRECATION")
 class ProfileActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var RootRef: DatabaseReference
+    private lateinit var UserProfileImage: StorageReference
     private lateinit var currentUserID:String
+    private val GalleryPick = 1;
+    private lateinit var profile_image: CircleImageView
+    private lateinit var progressBar:ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,12 +41,20 @@ class ProfileActivity : AppCompatActivity() {
         val updateAccountProfile= findViewById<Button>(R.id.update_settings_button)
       //  val userName = findViewById<EditText>(R.id.set_user_name)
       //  val userStatus = findViewById<EditText>(R.id.set_profile_status)
-      //  val CircleImageView = findViewById<CircleImageView>(R.id.set_profile_image)
+        profile_image = findViewById<CircleImageView>(R.id.set_profile_image)
+        progressBar = ProgressDialog(this)
 
         auth = FirebaseAuth.getInstance()
         currentUserID = auth.currentUser?.uid.toString()
         RootRef = FirebaseDatabase.getInstance().reference
+        UserProfileImage = FirebaseStorage.getInstance().reference
 
+        //PICK PHOTO FROM GALLERY
+        profile_image.setOnClickListener{
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            intent.type = "image/*"
+            startActivityForResult(intent, GalleryPick)
+        }
 
         updateAccountProfile.setOnClickListener{
             UpdateProfile()
@@ -40,6 +64,53 @@ class ProfileActivity : AppCompatActivity() {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GalleryPick && resultCode == Activity.RESULT_OK && data != null){
+            val uri = data.data
+            CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setAspectRatio(1,1).start(this)
+    }
+        if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            val result = CropImage.getActivityResult(data)
+
+            if (resultCode === Activity.RESULT_OK) {
+                progressBar.setTitle("Set Profile Image")
+                progressBar.setMessage("Please wait your profile image is updating..")
+                progressBar.setCanceledOnTouchOutside(false)
+                progressBar.show()
+                val resultUri: Uri = result.uri
+                val filePath: StorageReference = UserProfileImage.child(currentUserID +".png")
+                filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(applicationContext, "Profile Image Uploaded Successfully", Toast.LENGTH_LONG).show()
+
+                          val downloadUrl:String= task.getResult()?.getStorage()?.getDownloadUrl().toString()
+                            RootRef.child("Users").child(currentUserID).child("image")
+                                .setValue(downloadUrl)
+                                .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(applicationContext, "Image Saved Successfully", Toast.LENGTH_LONG).show()
+                                        progressBar.dismiss()
+                                    }else{
+                                        Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+                                        progressBar.dismiss()
+                                    }
+                                })
+
+                        }
+                    else{
+                            Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+                            progressBar.dismiss()
+                        }
+                })
+            }
+
+        }
+
+        }
+
+
+
     private fun RetrieveUserInfo() {
         RootRef.child("Users").child(currentUserID)
             .addValueEventListener(object: ValueEventListener {
@@ -47,8 +118,11 @@ class ProfileActivity : AppCompatActivity() {
                     if (dataSnapshot.exists() && dataSnapshot.hasChild("name")) {
                         val retrieveUserName = dataSnapshot.child("name").getValue().toString()
                         val retrieveStatus = dataSnapshot.child("status").getValue().toString()
+                        val retrieveImage = dataSnapshot.child("image").getValue().toString()
                         set_user_name.setText(retrieveUserName)
                         set_profile_status.setText(retrieveStatus)
+
+                        Picasso.get().load(retrieveImage).into(profile_image);
                     }
                     else {
                         val toast = Toast.makeText(applicationContext, "Please set your profile ", Toast.LENGTH_LONG)

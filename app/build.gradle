@@ -62,4 +62,10 @@ dependencies {
 
     //Circle
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //Image Cropper
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
+
+    //TAKE IMAGE FROM FIREBASE
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

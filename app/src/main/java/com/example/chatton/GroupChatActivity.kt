@@ -2,11 +2,12 @@ package com.example.chatton
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import android.widget.Button
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.FirebaseError
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_group_chat.*
@@ -22,6 +23,7 @@ class GroupChatActivity : AppCompatActivity() {
     private lateinit var currentTime: String
     private lateinit var currentDate: String
     private lateinit var currentUserID: String
+    private lateinit var scroll_view:ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +36,7 @@ class GroupChatActivity : AppCompatActivity() {
         val currentGroupName = intent.extras?.get("Group Name").toString()
         Toast.makeText(applicationContext, "You Entered " + currentGroupName + " Group", Toast.LENGTH_LONG).show()
         setTitle("Group: " + currentGroupName)
+        scroll_view = findViewById(R.id.scroll_view)
 
         //FIREBASE CONNECTION
         auth = FirebaseAuth.getInstance()
@@ -71,6 +74,8 @@ class GroupChatActivity : AppCompatActivity() {
             }
 
             edit_text.setText("")
+
+            scroll_view.post(Runnable { scroll_view.fullScroll(View.FOCUS_DOWN) })
         }
 
     }
@@ -113,8 +118,13 @@ class GroupChatActivity : AppCompatActivity() {
             val chatName = iterator.next().getValue().toString()
             val chatTime = iterator.next().getValue().toString()
 
-            text.append(chatName+": \n" + chatMessage + "\n"  + chatTime +"\n" + chatDate+ "\n\n\n")
+            text.append(chatName+": \n" + chatMessage + "\n"  + chatTime +"         " + chatDate+ "\n\n\n")
+
+            scroll_view.post {
+                scroll_view.fullScroll(View.FOCUS_DOWN)
+            }
         }
+        //scroll_view.fullScroll(ScrollView.FOCUS_DOWN)
 
     }
 

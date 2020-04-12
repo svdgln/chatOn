@@ -24,7 +24,7 @@ class ChatAdapter(var mCtx: Context, var resources:Int, var items:List<ChatModel
         return view
 
 
-        return super.getView(position, convertView, parent)
+        //return super.getView(position, convertView, parent)
     }
 
 }

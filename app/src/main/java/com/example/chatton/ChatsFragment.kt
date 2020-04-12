@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import android.annotation.SuppressLint;
-import android.app.ListFragment;
 
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
