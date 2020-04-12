@@ -31,6 +31,7 @@ class ProfileActivity : AppCompatActivity() {
         currentUserID = auth.currentUser?.uid.toString()
         RootRef = FirebaseDatabase.getInstance().reference
 
+
         updateAccountProfile.setOnClickListener{
             UpdateProfile()
         }

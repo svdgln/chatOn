@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import kotlinx.android.synthetic.main.activity_group_chat.*
 
 class GroupChatActivity : AppCompatActivity() {
 

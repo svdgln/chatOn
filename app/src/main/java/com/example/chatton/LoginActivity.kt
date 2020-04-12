@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 class LoginActivity : AppCompatActivity() {
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth
+    lateinit var PhoneLoginButton : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
         //val login_password = findViewById<EditText>(R.id.login_password)
         val login_buton = findViewById<Button>(R.id.login_buton)
         val new_account = findViewById<TextView>(R.id.new_account)
+        PhoneLoginButton = findViewById(R.id.phone_login_button)
 
         auth = FirebaseAuth.getInstance()
         currentUser = auth.currentUser
@@ -35,6 +37,12 @@ class LoginActivity : AppCompatActivity() {
         login_buton.setOnClickListener{
             AllowUserToLogin()
         }
+        PhoneLoginButton.setOnClickListener {
+            val intent = Intent(this, PhoneLogin::class.java)
+            startActivity(intent)
+        }
+
+
     }
 
     private fun AllowUserToLogin() {

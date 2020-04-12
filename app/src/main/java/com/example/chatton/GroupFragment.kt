@@ -107,6 +107,12 @@ class GroupFragment : Fragment() {
 
 
 
+
+
+
+
+
+
 /*   val titleTextView2: TextView = view.findViewById(R.id.text2)
 val titleTextView3: TextView = view.findViewById(R.id.text3)
 val titleTextView4: TextView = view.findViewById(R.id.text4)
