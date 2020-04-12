@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-// Can be used for Chat Listview too
 class ChatAdapter(var mCtx: Context, var resources:Int, var items:List<ChatModel>):ArrayAdapter<ChatModel>(mCtx, resources, items) {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val layoutInflater:LayoutInflater = LayoutInflater.from(mCtx)
