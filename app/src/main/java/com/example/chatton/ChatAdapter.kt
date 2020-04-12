@@ -13,13 +13,11 @@ class ChatAdapter(var mCtx: Context, var resources:Int, var items:List<ChatModel
         val layoutInflater:LayoutInflater = LayoutInflater.from(mCtx)
         val view:View = layoutInflater.inflate(resources, null)
 
-        val imageView: ImageView = view.findViewById(R.id.profilephoto)
-        val titleTextView: TextView = view.findViewById(R.id.textView)
-        val descriptionTextView:TextView = view.findViewById(R.id.textView2)
+        val titleTextView: TextView = view.findViewById(R.id.text1)
+        val descriptionTextView:TextView = view.findViewById(R.id.text2)
 
 
         var mItem:ChatModel = items[position]
-        imageView.setImageDrawable(mCtx.resources.getDrawable(mItem.img))
         titleTextView.text = mItem.title
         descriptionTextView.text = mItem.description
 
