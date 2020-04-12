@@ -71,12 +71,6 @@
 
     </LinearLayout>
 
-
-    <ScrollView android:layout_marginTop="30dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/scrollView">
-
         <FrameLayout
             android:id="@+id/view"
             android:layout_width="match_parent"
@@ -84,7 +78,6 @@
 
         </FrameLayout>
 
-    </ScrollView>
 
 
 </LinearLayout>
