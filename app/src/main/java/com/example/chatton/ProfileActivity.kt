@@ -5,11 +5,13 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.TextUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +24,8 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_profile.*
+import java.io.File
+import java.net.URL
 
 
 @Suppress("DEPRECATION")
@@ -33,6 +37,7 @@ class ProfileActivity : AppCompatActivity() {
     private val GalleryPick = 1;
     private lateinit var profile_image: CircleImageView
     private lateinit var progressBar:ProgressDialog
+    private lateinit var resultUri:Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +52,11 @@ class ProfileActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         currentUserID = auth.currentUser?.uid.toString()
         RootRef = FirebaseDatabase.getInstance().reference
-        UserProfileImage = FirebaseStorage.getInstance().reference
+        UserProfileImage = FirebaseStorage.getInstance().reference.child("Profile Image")
+
+        if (profile_image == null) {
+            profile_image = CircleImageView(this)
+        }
 
         //PICK PHOTO FROM GALLERY
         profile_image.setOnClickListener{
@@ -67,8 +76,9 @@ class ProfileActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == GalleryPick && resultCode == Activity.RESULT_OK && data != null){
-            val uri = data.data
+          //  val uri = data.data
             CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setAspectRatio(1,1).start(this)
+
     }
         if (requestCode === CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             val result = CropImage.getActivityResult(data)
@@ -78,12 +88,12 @@ class ProfileActivity : AppCompatActivity() {
                 progressBar.setMessage("Please wait your profile image is updating..")
                 progressBar.setCanceledOnTouchOutside(false)
                 progressBar.show()
-                val resultUri: Uri = result.uri
-                val filePath: StorageReference = UserProfileImage.child(currentUserID +".png")
+                resultUri = result.uri
+                profile_image.setImageURI(resultUri)
+                val filePath: StorageReference = UserProfileImage.child(currentUserID + ".jpg" )
                 filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(applicationContext, "Profile Image Uploaded Successfully", Toast.LENGTH_LONG).show()
-
                           val downloadUrl:String= task.getResult()?.getStorage()?.getDownloadUrl().toString()
                             RootRef.child("Users").child(currentUserID).child("image")
                                 .setValue(downloadUrl)
@@ -115,14 +125,19 @@ class ProfileActivity : AppCompatActivity() {
         RootRef.child("Users").child(currentUserID)
             .addValueEventListener(object: ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists() && dataSnapshot.hasChild("name")) {
+                    if (dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status") && dataSnapshot.hasChild("image")) {
                         val retrieveUserName = dataSnapshot.child("name").getValue().toString()
                         val retrieveStatus = dataSnapshot.child("status").getValue().toString()
                         val retrieveImage = dataSnapshot.child("image").getValue().toString()
                         set_user_name.setText(retrieveUserName)
                         set_profile_status.setText(retrieveStatus)
+                        //profile_image.setImageURI(resultUri)
 
-                        Picasso.get().load(retrieveImage).into(profile_image);
+                       // Picasso.get().load(retrieveImage).resize(50, 50).centerCrop().into(profile_image)
+                       // Picasso.get().load(retrieveImage).into(profile_image);
+                        //Picasso.with(applicationContext).load(imageUri).into(ivBasicImage);
+                        //Glide.with(applicationContext).load(retrieveImage).into(profile_image)
+
                     }
                     else {
                         val toast = Toast.makeText(applicationContext, "Please set your profile ", Toast.LENGTH_LONG)

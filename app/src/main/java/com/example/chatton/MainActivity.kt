@@ -116,6 +116,11 @@ class MainActivity : AppCompatActivity() {
                 requestNewGroup()
                 return true
             }
+            R.id.main_find_friend -> {
+                val intent = Intent(this, FindFriendActivity::class.java)
+                startActivity(intent)
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
