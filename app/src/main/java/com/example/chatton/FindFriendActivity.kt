@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.NonNull
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerAdapter
@@ -22,6 +23,12 @@ class FindFriendActivity : AppCompatActivity() {
         recycler_view.layoutManager = LinearLayoutManager(this)
         setTitle("Find Friend")
 
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+//TODO: Add Firebase adapter
 
     }
 

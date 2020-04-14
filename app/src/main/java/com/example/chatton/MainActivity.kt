@@ -51,9 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         //TOOLBAR
         setSupportActionBar(toolbar)
-        setTitle("ChattOn")
-
-
+        setTitle("ChatOn")
     }
 
     fun changeFragment(fragment: Fragment) {

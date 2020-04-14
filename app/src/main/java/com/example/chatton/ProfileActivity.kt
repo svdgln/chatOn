@@ -34,7 +34,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var RootRef: DatabaseReference
     private lateinit var UserProfileImage: StorageReference
     private lateinit var currentUserID:String
-    private val GalleryPick = 1;
+    private val GalleryPick = 1
     private lateinit var profile_image: CircleImageView
     private lateinit var progressBar:ProgressDialog
     private lateinit var resultUri:Uri
@@ -94,7 +94,7 @@ class ProfileActivity : AppCompatActivity() {
                 filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(applicationContext, "Profile Image Uploaded Successfully", Toast.LENGTH_LONG).show()
-                          val downloadUrl:String= task.getResult()?.getStorage()?.getDownloadUrl().toString()
+                          val downloadUrl:String= task.result?.storage?.downloadUrl.toString()
                             RootRef.child("Users").child(currentUserID).child("image")
                                 .setValue(downloadUrl)
                                 .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
@@ -125,12 +125,18 @@ class ProfileActivity : AppCompatActivity() {
         RootRef.child("Users").child(currentUserID)
             .addValueEventListener(object: ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    // Username, Status, Photo
                     if (dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status") && dataSnapshot.hasChild("image")) {
-                        val retrieveUserName = dataSnapshot.child("name").getValue().toString()
-                        val retrieveStatus = dataSnapshot.child("status").getValue().toString()
-                        val retrieveImage = dataSnapshot.child("image").getValue().toString()
+                        val retrieveUserName = dataSnapshot.child("name").value.toString()
+
+                        //set_user_name.hint = retrieveUserName
+                        val retrieveStatus = dataSnapshot.child("status").value.toString()
+                       // set_profile_status.hint = retrieveStatus
+                        val retrieveImage = dataSnapshot.child("image").value.toString()
                         set_user_name.setText(retrieveUserName)
                         set_profile_status.setText(retrieveStatus)
+
+                       // set_profile_image.setImageURI(resultUri)
                         //profile_image.setImageURI(resultUri)
 
                        // Picasso.get().load(retrieveImage).resize(50, 50).centerCrop().into(profile_image)
@@ -138,8 +144,22 @@ class ProfileActivity : AppCompatActivity() {
                         //Picasso.with(applicationContext).load(imageUri).into(ivBasicImage);
                         //Glide.with(applicationContext).load(retrieveImage).into(profile_image)
 
+                        //USERNAME AND STATUS
+                    }else if (dataSnapshot.exists() && dataSnapshot.hasChild("name") && dataSnapshot.hasChild("status")){
+                        val retrieveUserName = dataSnapshot.child("name").value.toString()
+                        val retrieveStatus = dataSnapshot.child("status").value.toString()
+                        set_user_name.setText(retrieveUserName)
+                        set_profile_status.setText(retrieveStatus)
+                        //USERNAME
+                    } else if (dataSnapshot.exists() && dataSnapshot.hasChild("name")){
+                        val retrieveUserName = dataSnapshot.child("name").value.toString()
+                        set_user_name.setText(retrieveUserName)
+                        // STATUS
+                    } else if(dataSnapshot.exists() && dataSnapshot.hasChild("name") ){
+                        val retrieveStatus = dataSnapshot.child("status").value.toString()
+                        set_profile_status.setText(retrieveStatus)
                     }
-                    else {
+                   else {
                         val toast = Toast.makeText(applicationContext, "Please set your profile ", Toast.LENGTH_LONG)
                         toast.show()
                     }
