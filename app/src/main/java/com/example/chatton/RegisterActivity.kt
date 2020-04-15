@@ -45,6 +45,7 @@ class RegisterActivity : AppCompatActivity() {
     private fun CretateNewAccount() {
         val mail = register_mail.text.toString()
         val password = register_password.text.toString()
+        val password2 = register_password2.text.toString()
 
         if (TextUtils.isEmpty(mail)) {
             val toast = Toast.makeText(applicationContext, "Please Enter Mail", Toast.LENGTH_LONG)
@@ -52,6 +53,14 @@ class RegisterActivity : AppCompatActivity() {
         }
         if (TextUtils.isEmpty(password)) {
             val toast = Toast.makeText(applicationContext, "Please Enter Password", Toast.LENGTH_LONG)
+            toast.show()
+        }
+        if (TextUtils.isEmpty(password2)) {
+            val toast = Toast.makeText(applicationContext, "Please Enter Password", Toast.LENGTH_LONG)
+            toast.show()
+        }
+        if (password!=password2) {
+            val toast = Toast.makeText(applicationContext, "Passwords don't match. Please re-enter passwords", Toast.LENGTH_LONG)
             toast.show()
         }
         else{
