@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RequestActivity">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/visit_profile_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/profile"
+        app:civ_border_width="5dp"
+        app:civ_border_color="#FF000000"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="110dp"
+
+        />
+
+    <TextView
+        android:id="@+id/visit_user_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Name"
+        android:layout_below="@+id/visit_profile_image"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="5dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textStyle="bold">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/visit_user_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User Status"
+        android:layout_below="@+id/visit_user_name"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="25dp"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="25sp"
+        android:textStyle="bold">
+
+    </TextView>
+
+    <Button
+        android:id="@+id/send_request_buton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/visit_user_status"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="65dp"
+        android:layout_marginRight="65dp"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/color_gray"
+        android:text="Send Message"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        >
+
+    </Button>
+
+
+
+
+</RelativeLayout>

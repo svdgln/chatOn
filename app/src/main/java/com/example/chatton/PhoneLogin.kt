@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.chatton
 
 import android.app.ProgressDialog
@@ -19,6 +21,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.concurrent.TimeUnit
 
+@Suppress("DEPRECATION")
 class PhoneLogin : AppCompatActivity() {
 
     private lateinit var SendVerificationCodeButton : Button

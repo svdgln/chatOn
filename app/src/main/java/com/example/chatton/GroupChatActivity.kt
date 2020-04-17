@@ -31,7 +31,7 @@ class GroupChatActivity : AppCompatActivity() {
 
         //DEFINITON
         val buton = findViewById<Button>(R.id.buton)
-        val text = findViewById<TextView>(R.id.text)
+     //   val text = findViewById<TextView>(R.id.text)
         val edit_text = findViewById<TextView>(R.id.edit_text)
         val currentGroupName = intent.extras?.get("Group Name").toString()
         Toast.makeText(applicationContext, "You Entered " + currentGroupName + " Group", Toast.LENGTH_LONG).show()

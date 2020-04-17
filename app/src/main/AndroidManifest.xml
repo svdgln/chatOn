@@ -14,8 +14,10 @@
         android:roundIcon="@mipmap/ic_launcher_rounded"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".FindFriendActivity"
-            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".RequestActivity"></activity>
+        <activity
+            android:name=".FindFriendActivity"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".PhoneLogin" />
         <activity android:name=".GroupChatActivity" />
         <activity android:name=".ProfileActivity" />
