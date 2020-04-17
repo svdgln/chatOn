@@ -31,7 +31,8 @@ class RequestActivity : AppCompatActivity() {
 
         userName = findViewById<TextView>(R.id.visit_user_name)
         userStatus = findViewById<TextView>(R.id.visit_user_status)
-        val senRequestButon:Button= findViewById<Button>(R.id.send_request_buton)
+        val sendRequestButon:Button= findViewById<Button>(R.id.send_request_buton)
+        val declineRequestButon:Button= findViewById<Button>(R.id.decline_request_buton)
         current_state = "new"
         auth = FirebaseAuth.getInstance()
         currentUserID = auth.currentUser?.uid.toString()
@@ -64,6 +65,15 @@ class RequestActivity : AppCompatActivity() {
                 if (Request_Type.equals("sent")) {
                     current_state = "request_sent"
                     send_request_buton.setText("Cancel Chat Request")
+                }
+                else if (Request_Type.equals("received")){
+                    current_state = "request_sent"
+                    send_request_buton.setText("Accept Chat Request")
+                    decline_request_buton.visibility = View.VISIBLE
+                    decline_request_buton.isEnabled = true
+                    decline_request_buton.setOnClickListener{
+                        CancelChatRequest()
+                    }
                 }
             }
 
