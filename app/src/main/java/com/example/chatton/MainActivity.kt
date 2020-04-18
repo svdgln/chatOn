@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         val alert = AlertDialog.Builder(this)
         alert.setTitle("Enter Group Name: ")
         val groupNameField = EditText(this)
-        groupNameField.setHint("e.g Cofing Cafe")
+        groupNameField.setHint("e.g Coding Cafe")
         alert.setView(groupNameField)
         alert.setPositiveButton("Create") { dialogInterface: DialogInterface, i: Int ->
             val groupName = groupNameField.text.toString()
