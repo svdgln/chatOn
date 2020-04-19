@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_register.*
+import java.util.regex.Pattern
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -42,19 +43,22 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
+    // TODO Password Validation https://gist.github.com/KalpeshTalkar/e6a50efd08a3d5d142e47da559936bb7
     private fun CretateNewAccount() {
         val mail = register_mail.text.toString()
         val password = register_password.text.toString()
         val password2 = register_password2.text.toString()
 
         if (TextUtils.isEmpty(mail)) {
-            val toast = Toast.makeText(applicationContext, "Please Enter Mail", Toast.LENGTH_LONG)
+            val toast = Toast.makeText(applicationContext, "Please Enter Mail" , Toast.LENGTH_LONG)
+
             toast.show()
         }
         if (TextUtils.isEmpty(password)) {
             val toast = Toast.makeText(applicationContext, "Please Enter Password", Toast.LENGTH_LONG)
             toast.show()
         }
+
         if (TextUtils.isEmpty(password2)) {
             val toast = Toast.makeText(applicationContext, "Please Enter Password", Toast.LENGTH_LONG)
             toast.show()
@@ -82,4 +86,6 @@ class RegisterActivity : AppCompatActivity() {
             })
         }
     }
+
+
 }
