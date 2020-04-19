@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -12,6 +12,17 @@
     </style>
     <style name="AlertDialog" parent="Base.Theme.AppCompat.Light.Dialog"></style>
 
-
+    <style name="nav_menu_style" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="color">@color/color_white</item>
+        <item name="android:solidColor">@color/color_black</item>
+        <item name="strokeColor">@color/colorPrimary</item>
+        <item name="android:paddingLeft" >2dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">1dp</item>
+        <item name="android:bottomRightRadius">10dip</item>
+        <item name="android:bottomLeftRadius">10dip</item>
+        <item name="android:topLeftRadius">1dip</item>
+        <item name="android:topRightRadius">1dip</item>
+    </style>
 
 </resources>

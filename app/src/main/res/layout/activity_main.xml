@@ -12,7 +12,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="5dp"
         android:theme="@style/AppTheme">
 
         <androidx.appcompat.widget.Toolbar
@@ -36,12 +36,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CHAT"
+            android:background="@drawable/rounded_white_btn"
             android:textColor="@color/color_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:layout_weight="1"
             android:layout_alignParentLeft="true"
-            style="@style/Widget.MaterialComponents.Button.TextButton">
+            style="@style/nav_menu_style">
         </Button>
 
         <Button
@@ -50,11 +51,11 @@
             android:layout_height="wrap_content"
             android:text="GROUP"
             android:textColor="@color/color_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:layout_weight="1"
             android:layout_centerInParent="true"
-            style="@style/Widget.MaterialComponents.Button.TextButton">
+            style="@style/nav_menu_style">
         </Button>
 
         <Button
@@ -63,11 +64,11 @@
             android:layout_height="wrap_content"
             android:text="CONTACT"
             android:textColor="@color/color_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:layout_weight="1"
             android:layout_alignParentRight="true"
-            style="@style/Widget.MaterialComponents.Button.TextButton">
+            style="@style/nav_menu_style">
 
         </Button>
 
@@ -77,11 +78,11 @@
             android:layout_height="wrap_content"
             android:text="REQUEST"
             android:textColor="@color/color_black"
-            android:textSize="15sp"
+            android:textSize="13sp"
             android:layout_weight="1"
             android:textStyle="bold"
             android:layout_alignParentRight="true"
-            style="@style/Widget.MaterialComponents.Button.TextButton">
+            style="@style/nav_menu_style">
 
         </Button>
 
