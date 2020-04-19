@@ -18,6 +18,7 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var ChatRequestRef: DatabaseReference
     private lateinit var ContactsRef: DatabaseReference
     private lateinit var RootRef: DatabaseReference
+    private lateinit var NotificationRef: DatabaseReference
     private lateinit var userName: TextView
     private lateinit var userStatus: TextView
     private lateinit var current_state:String
@@ -42,6 +43,7 @@ class RequestActivity : AppCompatActivity() {
         ChatRequestRef = FirebaseDatabase.getInstance().reference.child("Chat Requests")
         RootRef = FirebaseDatabase.getInstance().reference
         ContactsRef = FirebaseDatabase.getInstance().reference.child("Contacts")
+        NotificationRef = FirebaseDatabase.getInstance().reference.child("Notifications")
         UserRef.child(receiverUserID).addValueEventListener(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
                 TODO("Not yet implemented")
@@ -134,9 +136,21 @@ class RequestActivity : AppCompatActivity() {
                     ChatRequestRef.child(receiverUserID).child(currentUserID).child("Request_Type").setValue("received")
                         .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
                             if (task.isSuccessful) {
-                                send_request_buton.isEnabled = true
-                                current_state = "request_sent"
-                                send_request_buton.setText("Cancel Chat Request")
+
+                                var hashMap : HashMap<String, String> = HashMap<String, String> ()
+                                hashMap.put("from", currentUserID)
+                                hashMap.put("type", "request")
+
+                                NotificationRef.child(receiverUserID).push().setValue(hashMap).addOnCompleteListener(
+                                    OnCompleteListener {
+                                        if (task.isSuccessful){
+                                            send_request_buton.isEnabled = true
+                                            current_state = "request_sent"
+                                            send_request_buton.setText("Cancel Chat Request")
+                                        }
+                                    })
+
+
                             }
                         })
                 }

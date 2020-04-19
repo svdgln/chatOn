@@ -70,6 +70,7 @@ class ChatActivity : AppCompatActivity() {
             messageTextBody.put("message",mesegeText)
             messageTextBody.put("type","text")
             messageTextBody.put("from",currentUserID)
+            messageTextBody.put("to",MessengerUserID)
 
             var messageBodyDetail : HashMap<String, HashMap<String,String>> = HashMap<String, HashMap<String,String>> ()
             messageBodyDetail.put(currentUserID + "/" + messagePushID , messageTextBody)
@@ -120,23 +121,23 @@ class ChatActivity : AppCompatActivity() {
         while (iterator.hasNext()) {
             val from = iterator.next().getValue().toString()
             val message = iterator.next().getValue().toString()
+            val to = iterator.next().getValue().toString()
             val type = iterator.next().getValue().toString()
 
-            if (from.equals(currentUserID)) {
+
+            if (from.equals(currentUserID) && to.equals(MessengerUserID)) {
                 sendMessage.add(message)
             }
 
-            else if (from.equals(MessengerUserID)) {
+            else if (from.equals(MessengerUserID) && to.equals(currentUserID)) {
                 receivedMessage.add(message)
             }
 
-            else {
-                Toast.makeText(applicationContext, "You have no messages", Toast.LENGTH_LONG).show()
-            }
         }
 
         listview.adapter = ChatActivity.Adapter(this, R.layout.custom_messages, sendMessage , receivedMessage)
         listview.post(Runnable { listview.setSelection(listview.getCount() - 1) })
+
         //listview.smoothScrollToPosition(5);
 
     }

@@ -14,9 +14,11 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.iid.FirebaseInstanceId
 import kotlinx.android.synthetic.main.activity_register.*
 import java.util.regex.Pattern
 
+@Suppress("DEPRECATION")
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var RootRef: DatabaseReference
@@ -70,10 +72,15 @@ class RegisterActivity : AppCompatActivity() {
         else{
             auth.createUserWithEmailAndPassword(mail,password).addOnCompleteListener ( this, OnCompleteListener<AuthResult> { task ->
                 if (task.isSuccessful) {
+
+                    val deviceToken = FirebaseInstanceId.getInstance().token
                     val currentuserID = auth.currentUser?.uid
                     if (currentuserID != null) {
                         RootRef.child("User").child(currentuserID).setValue("")
                     }
+
+                    RootRef.child("Users").child(currentuserID.toString()).child("device_token").setValue(deviceToken)
+
                     val intent = Intent(this, LoginActivity::class.java)
                     startActivity(intent)
                     val toast = Toast.makeText(applicationContext, "Account Created Successfully ", Toast.LENGTH_LONG)
