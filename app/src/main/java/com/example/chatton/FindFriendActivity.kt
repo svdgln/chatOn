@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.annotation.NonNull
@@ -21,6 +22,7 @@ import com.google.firebase.database.*
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_find_friend.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_request.*
 import java.text.FieldPosition
 
 class FindFriendActivity : AppCompatActivity() {
@@ -90,7 +92,9 @@ class FindFriendActivity : AppCompatActivity() {
                 val titleTextView: TextView = view.findViewById(R.id.text)
                 val subtitleTextView: TextView = view.findViewById(R.id.subtext)
                 val profileImage:CircleImageView=view.findViewById(R.id.profile_image)
-
+                val send_message_buton:Button= view.findViewById(R.id.send_message_buton)
+                send_message_buton.visibility = View.INVISIBLE
+                send_message_buton.isEnabled = false
 
                 var mItem: String = itemName[position]
                 titleTextView.text = mItem

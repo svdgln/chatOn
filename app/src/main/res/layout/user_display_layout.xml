@@ -60,6 +60,17 @@
                 android:textAlignment="textStart"
                 android:gravity="start"></TextView>
 
+            <Button
+                android:id="@+id/send_message_buton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Messege"
+                android:padding="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounded_btn"
+                android:textStyle="bold"
+                android:textColor="@color/color_gray"></Button>
+
         </LinearLayout>
 
 

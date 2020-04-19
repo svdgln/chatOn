@@ -167,8 +167,8 @@ class MainActivity : AppCompatActivity() {
         startActivity(profileIntent)
     }
     private fun sendUserToSettingsActivity() {
-        val profileIntent = Intent(this, SettingsActivity::class.java)
-        startActivity(profileIntent)
+        val settingsIntent = Intent(this, SettingsActivity::class.java)
+        startActivity(settingsIntent)
     }
 
 
