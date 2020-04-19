@@ -23,11 +23,18 @@ class RequestFragment : Fragment() {
 
     var arrayListName = ArrayList<String>()
     var arrayListStatus = ArrayList<String>()
+    var sendRequestName = ArrayList<String>()
+    var sendRequestStatus = ArrayList<String>()
+    var currentIDList = ArrayList<String>()
+    var receiverIDList = ArrayList<String>()
+    var allUsersID = ArrayList<String>()
     private lateinit var ChatRequestRef: DatabaseReference
     private lateinit var RootRef: DatabaseReference
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth
     lateinit var receiverUserID:String
+    lateinit var sreceiverUserID:String
+    lateinit var token:String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,8 +61,14 @@ class RequestFragment : Fragment() {
                 val iterator = dataSnapshot.child("Chat Requests").child(currentuserID.toString()).children.iterator()
                 var ListName = ArrayList<String>()
                 var ListStatus = ArrayList<String>()
+                var sendName = ArrayList<String>()
+                var sendStatus = ArrayList<String>()
+                var currentID = ArrayList<String>()
+                var receiverID = ArrayList<String>()
+                var allusersID = ArrayList<String>()
                 while (iterator.hasNext()) {
                     iterator.next().key?.let {
+                        allusersID.add(it)
                             if (dataSnapshot.child("Chat Requests").child(currentuserID.toString()).child(it).child("Request_Type")
                                     .getValue()!!.equals("received")
                             ) {
@@ -68,24 +81,64 @@ class RequestFragment : Fragment() {
                                         .toString()
                                 )
 
-                                receiverUserID= it
+                                currentID.add(it)
+                             //   token = "received"
 
                             }
+
+                        if (dataSnapshot.child("Chat Requests").child(currentuserID.toString()).child(it).child("Request_Type")
+                                .getValue()!!.equals("sent")
+                        ) {
+                            sendName.add(
+                                dataSnapshot.child("Users").child(it).child("name").getValue()
+                                    .toString()
+                            )
+                            sendStatus.add(
+                                dataSnapshot.child("Users").child(it).child("status").getValue()
+                                    .toString()
+                            )
+
+                            receiverID.add(it)
+                           // token = "sent"
+
+                        }
                     }
+
                 }
                 if (!ListName.isEmpty()) {
                     arrayListName.clear()
                     arrayListStatus.clear()
                     arrayListName.addAll(ListName)
                     arrayListStatus.addAll(ListStatus)
+                    currentIDList.addAll(currentID)
+                    allUsersID.addAll(allusersID)
                     listview.adapter = Adapter(
                         context,
                         R.layout.request,
                         arrayListName,
                         arrayListStatus,
-                        receiverUserID
+                        currentIDList ,
+                        "received",
+                        allUsersID
                     )
                 }
+
+                /*
+                if(!sendName.isEmpty()) {
+                    sendRequestName.clear()
+                    sendRequestStatus.clear()
+                    sendRequestName.addAll(sendName)
+                    sendRequestStatus.addAll(sendStatus)
+                    receiverIDList.addAll(receiverID)
+                    listview.adapter = Adapter(
+                        context,
+                        R.layout.request,
+                        sendRequestName,
+                        sendRequestStatus,
+                        receiverIDList ,
+                        "sent"
+                    )
+                }*/
                 //   Adapter.notifyDataSetChanged()
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -93,7 +146,8 @@ class RequestFragment : Fragment() {
             }
         })}
 
-    class Adapter(var mCtx: Context, var resources: Int, var name: List<String> , var status: List<String> , var receiverUserID:String) :
+    class Adapter(var mCtx: Context, var resources: Int, var name: List<String> , var status: List<String> , var receiverUserID: List<String> ,
+                  var token:String, var allusersID:List<String>) :
         ArrayAdapter<String>(mCtx, resources, name) {
 
         private lateinit var ChatRequestRef: DatabaseReference
@@ -109,6 +163,7 @@ class RequestFragment : Fragment() {
 
             val titleTextView: TextView = view.findViewById(R.id.text)
             val subtitleTextView: TextView = view.findViewById(R.id.subtext)
+            val buton_state:ImageView= view.findViewById(R.id.state)
             val accept_buton: Button = view.findViewById(R.id.accept_buton)
             val cancel_buton: Button = view.findViewById(R.id.cancel_buton)
 
@@ -120,35 +175,62 @@ class RequestFragment : Fragment() {
             currentUserID = auth.currentUser?.uid.toString()
             val alert = AlertDialog.Builder(context)
 
-            accept_buton.setOnClickListener {
-                alert.setTitle("Exit")
-                alert.setMessage("You Sure?")
-                alert.setCancelable(false)
-                alert.setPositiveButton("No") { dialogInterface: DialogInterface, i: Int ->
-                    dialogInterface.dismiss()
+           // if (RootRef.child("Users").child(allusersID[position]).child("userState").) //HERKESIN USER STATE oLUNCA BAK
+
+
+            if (token.equals("received")) {
+                accept_buton.setText("Accept")
+                accept_buton.setOnClickListener {
+                    alert.setTitle("Exit")
+                    alert.setMessage("You Sure?")
+                    alert.setCancelable(false)
+                    alert.setPositiveButton("No") { dialogInterface: DialogInterface, i: Int ->
+                        dialogInterface.dismiss()
+
+                    }
+
+                    alert.setNegativeButton("yes") { dialogInterface: DialogInterface, i: Int ->
+                        AcceptChatRequest(position)
+                    }
+                    alert.show()
 
                 }
+            } else{
+                accept_buton.setText("Req Sent")
 
-                alert.setNegativeButton("yes") { dialogInterface: DialogInterface, i: Int ->
-                    AcceptChatRequest()
+                accept_buton.setOnClickListener{
+                    alert.setTitle("Exit")
+                    alert.setMessage("You have already sent request. Do you want to delete chat request?")
+                    alert.setCancelable(false)
+                    alert.setPositiveButton("Yes") { dialogInterface: DialogInterface, i: Int ->
+                        CancelChatRequest(position)
+
+                    }
+                    alert.show()
                 }
-                alert.show()
-
             }
 
-            cancel_buton.setOnClickListener{
-                alert.setTitle("Exit")
-                alert.setMessage("You Sure?")
-                alert.setCancelable(false)
-                alert.setPositiveButton("No") { dialogInterface: DialogInterface, i: Int ->
-                    dialogInterface.dismiss()
+            if (token.equals("received")) {
+                cancel_buton.isEnabled= true
+                cancel_buton.visibility=View.VISIBLE
 
-                }
+                cancel_buton.setOnClickListener {
+                    alert.setTitle("Exit")
+                    alert.setMessage("You Sure?")
+                    alert.setCancelable(false)
+                    alert.setPositiveButton("No") { dialogInterface: DialogInterface, i: Int ->
+                        dialogInterface.dismiss()
 
-                alert.setNegativeButton("yes") { dialogInterface: DialogInterface, i: Int ->
-                    CancelChatRequest()
+                    }
+
+                    alert.setNegativeButton("yes") { dialogInterface: DialogInterface, i: Int ->
+                        CancelChatRequest(position)
+                    }
+                    alert.show()
                 }
-                alert.show()
+            } else{
+                cancel_buton.isEnabled= false
+                cancel_buton.visibility=View.INVISIBLE
             }
 
 
@@ -162,20 +244,20 @@ class RequestFragment : Fragment() {
             return view
         }
 
-        fun AcceptChatRequest() {
-            RootRef.child("Contacts").child(currentUserID).child(receiverUserID).child("contact")
+        fun AcceptChatRequest(position: Int) {
+            RootRef.child("Contacts").child(currentUserID).child(receiverUserID[position]).child("contact")
                 .setValue("Saved")
                 .addOnCompleteListener(OnCompleteListener { task ->
                     if (task.isSuccessful){
 
-                        RootRef.child("Contacts").child(receiverUserID).child(currentUserID).child("contact")
+                        RootRef.child("Contacts").child(receiverUserID[position]).child(currentUserID).child("contact")
                             .setValue("Saved")
                             .addOnCompleteListener(OnCompleteListener { task ->
                                 if (task.isSuccessful){
-                                    ChatRequestRef.child(currentUserID).child(receiverUserID).removeValue().addOnCompleteListener(
+                                    ChatRequestRef.child(currentUserID).child(receiverUserID[position]).removeValue().addOnCompleteListener(
                                         OnCompleteListener { task ->
                                             if (task.isSuccessful){
-                                                ChatRequestRef.child(receiverUserID).child(currentUserID).removeValue().addOnCompleteListener(
+                                                ChatRequestRef.child(receiverUserID[position]).child(currentUserID).removeValue().addOnCompleteListener(
                                                     OnCompleteListener { task ->
                                                         if (task.isSuccessful){
                                                             Toast.makeText(context, "You and " + receiverUserID + " are friends ", Toast.LENGTH_LONG).show()
@@ -195,11 +277,11 @@ class RequestFragment : Fragment() {
 
 
         }
-        fun CancelChatRequest(){
-            ChatRequestRef.child(currentUserID).child(receiverUserID).removeValue().addOnCompleteListener(
+        fun CancelChatRequest(position:Int){
+            ChatRequestRef.child(currentUserID).child(receiverUserID[position]).removeValue().addOnCompleteListener(
                 OnCompleteListener { task ->
                     if (task.isSuccessful){
-                        ChatRequestRef.child(receiverUserID).child(currentUserID).removeValue().addOnCompleteListener(
+                        ChatRequestRef.child(receiverUserID[position]).child(currentUserID).removeValue().addOnCompleteListener(
                             OnCompleteListener { task ->
                                 if (task.isSuccessful){
                                     Toast.makeText(context, "You deleted ", Toast.LENGTH_LONG).show()

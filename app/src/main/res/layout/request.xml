@@ -43,6 +43,7 @@
                     android:textStyle="bold"></TextView>
 
                 <ImageView
+                    android:id="@+id/state"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:background="@drawable/ic_fiber_manual_record_black_24dp"

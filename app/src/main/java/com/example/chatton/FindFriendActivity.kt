@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.NonNull
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,9 +42,9 @@ class FindFriendActivity : AppCompatActivity() {
         RetrieveAndDisplayGroup(listview,this)
 
         listview.setOnItemClickListener { parent, view, position, id ->
-            val User = parent.getItemAtPosition(position).toString()
-            for (i in 0 until arrayListUserID.size) {
-                if(User == arrayListName.get(i)) {
+            val User = parent.getItemAtPosition(position)
+            for (i in 0 until arrayListName.size) {
+                if(User.equals(arrayListName.get(i))) {
                     UserID = arrayListUserID.get(i)
                 }
             }

@@ -152,14 +152,14 @@ class ChatActivity : AppCompatActivity() {
             val receivedMessage: TextView = view.findViewById(R.id.receiver_message_text)
 
 
-            if (!send.isEmpty()) {
-                var mItem: String = send[position]
+            if (!send.isEmpty() && position < send.size) {
+                var mItem: String = send[position] ///CUNKU POSITON LIST GET CEKIYORUZ OYLE BIR KULLANICI YOK HATA DONUYOR.
                 sendMessage.text = mItem
             }
 
-            if (!resend.isEmpty()) {
+            if (!resend.isEmpty()&& position < resend.size) {
 
-                var mItem2: String = resend[position]
+                var mItem2: String = resend[position] //POSITION OLARAK DONUNCE KAFASI KARISIYOR.
                 receivedMessage.text = mItem2
             }
 

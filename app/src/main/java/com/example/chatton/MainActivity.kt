@@ -18,12 +18,15 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth
     private lateinit var RootRef: DatabaseReference
+    private lateinit var currentUserID:String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +73,24 @@ class MainActivity : AppCompatActivity() {
             sendUserToLoginActivity();
         }
         else {
+            updateUserStatus("online")
             VeryUserExistance()
+        }
+    }
+
+    override protected fun onStop() {
+        super.onStop()
+
+        if (currentUser != null) {
+            updateUserStatus("offline")
+        }
+
+    }
+
+    override protected fun onDestroy() {
+        super.onDestroy()
+        if (currentUser != null) {
+            updateUserStatus("offline")
         }
     }
 
@@ -169,6 +189,26 @@ class MainActivity : AppCompatActivity() {
     private fun sendUserToSettingsActivity() {
         val settingsIntent = Intent(this, SettingsActivity::class.java)
         startActivity(settingsIntent)
+    }
+
+    private fun updateUserStatus(state:String){
+        val saveCurrenTime:String
+        val saveCurrenDate:String
+        val calender= Calendar.getInstance()
+        val currentDate= SimpleDateFormat("yyyy-MM-dd")
+        val currentTime = SimpleDateFormat("hh:mm a")
+        saveCurrenDate = currentDate.format(calender.time)
+        saveCurrenTime = currentTime.format(calender.time)
+
+        var hashMap : HashMap<String, Any> = HashMap<String, Any> ()
+        hashMap.put("time",saveCurrenTime)
+        hashMap.put("date",saveCurrenDate)
+        hashMap.put("state",state)
+
+        currentUserID = auth.currentUser!!.uid
+        RootRef.child("Users").child(currentUserID).child("userState").updateChildren(hashMap)
+
+
     }
 
 
