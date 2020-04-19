@@ -34,6 +34,7 @@ import java.net.URL
 class ProfileActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var RootRef: DatabaseReference
+    private lateinit var profileRef: DatabaseReference
     private lateinit var UserProfileImage: StorageReference
     private lateinit var currentUserID:String
     private val GalleryPick = 1;
@@ -44,6 +45,7 @@ class ProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+        setTitle("Profile")
 
         val updateAccountProfile= findViewById<Button>(R.id.update_settings_button)
       //  val userName = findViewById<EditText>(R.id.set_user_name)
@@ -54,6 +56,7 @@ class ProfileActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         currentUserID = auth.currentUser?.uid.toString()
         RootRef = FirebaseDatabase.getInstance().reference
+        profileRef = FirebaseDatabase.getInstance().reference.child("Users").child(currentUserID).child("image")
         UserProfileImage = FirebaseStorage.getInstance().reference.child("Profile Image")
 
         if (profile_image == null) {
@@ -91,8 +94,8 @@ class ProfileActivity : AppCompatActivity() {
                 progressBar.setCanceledOnTouchOutside(false)
                 progressBar.show()
                 resultUri = result.uri
-                profile_image.setImageURI(resultUri)
-                val filePath: StorageReference = UserProfileImage.child(currentUserID + ".jpg" )
+                //profile_image.setImageURI(resultUri)
+                val filePath: StorageReference = UserProfileImage.child(currentUserID )
                 filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(applicationContext, "Profile Image Uploaded Successfully", Toast.LENGTH_LONG).show()
@@ -133,10 +136,10 @@ class ProfileActivity : AppCompatActivity() {
                         val retrieveImage = dataSnapshot.child("image").getValue().toString()
                         set_user_name.setText(retrieveUserName)
                         set_profile_status.setText(retrieveStatus)
-                       // profile_image.setImageURI(resultUri)
-
-                       // Picasso.get().load(retrieveImage).resize(50, 50).centerCrop().into(profile_image)
-                       // Picasso.get().load(retrieveImage).into(set_profile_image);
+                        //profile_image.setImageURI(resultUri)
+                        //val path = UserProfileImage.child(currentUserID)
+                        //Picasso.get().load(resultUri).resize(50, 50).centerCrop().into(profile_image)
+                        //Picasso.get().load(retrieveImage).into(set_profile_image);
                         //Picasso.with(applicationContext).load(imageUri).into(ivBasicImage);
                         //Glide.with(applicationContext).load(retrieveImage).into(profile_image)
 
@@ -154,7 +157,7 @@ class ProfileActivity : AppCompatActivity() {
     private fun UpdateProfile() {
         val username = set_user_name.text.toString()
         val setStatus = set_profile_status.text.toString()
-
+        val profile = resultUri.toString() + ".png"
         if (TextUtils.isEmpty(username)) {
             val toast = Toast.makeText(applicationContext, "Please Write Your Name ", Toast.LENGTH_LONG)
             toast.show()
@@ -168,6 +171,7 @@ class ProfileActivity : AppCompatActivity() {
                 hashMap.put("uid",currentUserID)
                 hashMap.put("name",username)
                 hashMap.put("status",setStatus)
+                hashMap.put("image" , profile )
             RootRef.child("Users").child(currentUserID).setValue(hashMap)
                 .addOnCompleteListener(
                 OnCompleteListener { task ->

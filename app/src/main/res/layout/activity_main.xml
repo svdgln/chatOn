@@ -37,7 +37,8 @@
             android:layout_height="wrap_content"
             android:text="CHAT"
             android:textColor="@color/color_black"
-            android:textSize="20sp"
+            android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_weight="1"
             android:layout_alignParentLeft="true"
             style="@style/Widget.MaterialComponents.Button.TextButton">
@@ -49,7 +50,8 @@
             android:layout_height="wrap_content"
             android:text="GROUP"
             android:textColor="@color/color_black"
-            android:textSize="20sp"
+            android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_weight="1"
             android:layout_centerInParent="true"
             style="@style/Widget.MaterialComponents.Button.TextButton">
@@ -62,8 +64,23 @@
             android:layout_height="wrap_content"
             android:text="CONTACT"
             android:textColor="@color/color_black"
-            android:textSize="20sp"
+            android:textSize="17sp"
+            android:textStyle="bold"
             android:layout_weight="1"
+            android:layout_alignParentRight="true"
+            style="@style/Widget.MaterialComponents.Button.TextButton">
+
+        </Button>
+
+        <Button
+            android:id="@+id/request_buton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="REQUEST"
+            android:textColor="@color/color_black"
+            android:textSize="17sp"
+            android:layout_weight="1"
+            android:textStyle="bold"
             android:layout_alignParentRight="true"
             style="@style/Widget.MaterialComponents.Button.TextButton">
 

@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         val chat_buton = findViewById<Button>(R.id.chat_buton)
         val group_buton = findViewById<Button>(R.id.group_buton)
         val contact_buton = findViewById<Button>(R.id.contact_buton)
+        val request_buton = findViewById<Button>(R.id.request_buton)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
 
         auth = FirebaseAuth.getInstance()
@@ -48,6 +49,10 @@ class MainActivity : AppCompatActivity() {
             changeFragment(GroupFragment()) }
         contact_buton.setOnClickListener {
             changeFragment(ContactFragment()) }
+        request_buton.setOnClickListener{
+            changeFragment(RequestFragment())
+        }
+
 
         //TOOLBAR
         setSupportActionBar(toolbar)
@@ -75,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             RootRef.child(currentuserID).addValueEventListener(object: ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.child("name").exists()) {
-                        val toast = Toast.makeText(applicationContext, " ", Toast.LENGTH_LONG)
+                        val toast = Toast.makeText(applicationContext, "Wellcome", Toast.LENGTH_LONG)
                         toast.show()
                     }
 

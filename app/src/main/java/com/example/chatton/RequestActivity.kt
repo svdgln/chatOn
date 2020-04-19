@@ -28,8 +28,8 @@ class RequestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_request)
-
         receiverUserID = intent.extras?.get("ID").toString()
+        setTitle("Send a Request")
 
         userName = findViewById<TextView>(R.id.visit_user_name)
         userStatus = findViewById<TextView>(R.id.visit_user_status)
@@ -176,18 +176,9 @@ class RequestActivity : AppCompatActivity() {
                                                 decline_request_buton.isEnabled=false
                                             })
                                         }
-                                        else{
-                                            Toast.makeText(applicationContext," You couldnt be a friend", Toast.LENGTH_LONG).show()
-                                        }
                                     })
                                 }
-                                else{
-                                    Toast.makeText(applicationContext," You couldnt be a friend", Toast.LENGTH_LONG).show()
-                                }
                             })
-                }
-                    else{
-                    Toast.makeText(applicationContext," You couldnt be a friend", Toast.LENGTH_LONG).show()
                 }
             })
     }

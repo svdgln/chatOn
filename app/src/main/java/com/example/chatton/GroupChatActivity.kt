@@ -28,6 +28,7 @@ class GroupChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_chat)
+        setTitle("Group Chat")
 
         //DEFINITON
         val buton = findViewById<Button>(R.id.buton)
@@ -43,8 +44,6 @@ class GroupChatActivity : AppCompatActivity() {
         currentUserID = auth.currentUser!!.uid
         UserRef = FirebaseDatabase.getInstance().reference.child("Users")
         GroupRef = FirebaseDatabase.getInstance().reference.child("Group").child(currentGroupName)
-
-
         getUserInfo()
 
         buton.setOnClickListener{
