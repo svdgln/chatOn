@@ -34,7 +34,7 @@ class RequestFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     lateinit var receiverUserID:String
     lateinit var sreceiverUserID:String
-    lateinit var token:String
+    var tokens= ArrayList<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +66,7 @@ class RequestFragment : Fragment() {
                 var currentID = ArrayList<String>()
                 var receiverID = ArrayList<String>()
                 var allusersID = ArrayList<String>()
+                var token = ArrayList<String>()
                 while (iterator.hasNext()) {
                     iterator.next().key?.let {
                         allusersID.add(it)
@@ -83,23 +84,25 @@ class RequestFragment : Fragment() {
 
                                 currentID.add(it)
                              //   token = "received"
+                                token.add("received")
 
                             }
 
                         if (dataSnapshot.child("Chat Requests").child(currentuserID.toString()).child(it).child("Request_Type")
                                 .getValue()!!.equals("sent")
                         ) {
-                            sendName.add(
+                            ListName.add(
                                 dataSnapshot.child("Users").child(it).child("name").getValue()
                                     .toString()
                             )
-                            sendStatus.add(
+                            ListStatus.add(
                                 dataSnapshot.child("Users").child(it).child("status").getValue()
                                     .toString()
                             )
 
                             receiverID.add(it)
                            // token = "sent"
+                            token.add("sent")
 
                         }
                     }
@@ -112,6 +115,7 @@ class RequestFragment : Fragment() {
                     arrayListStatus.addAll(ListStatus)
                     currentIDList.addAll(currentID)
                     allUsersID.addAll(allusersID)
+                    tokens.addAll(token)
                     listview.adapter = Adapter(
                         context,
                         R.layout.request,
@@ -119,7 +123,8 @@ class RequestFragment : Fragment() {
                         arrayListStatus,
                         currentIDList ,
                         "received",
-                        allUsersID
+                        allUsersID,
+                        tokens
                     )
                 }
 
@@ -147,7 +152,7 @@ class RequestFragment : Fragment() {
         })}
 
     class Adapter(var mCtx: Context, var resources: Int, var name: List<String> , var status: List<String> , var receiverUserID: List<String> ,
-                  var token:String, var allusersID:List<String>) :
+                  var token:String, var allusersID:List<String> , var tokens:List<String>) :
         ArrayAdapter<String>(mCtx, resources, name) {
 
         private lateinit var ChatRequestRef: DatabaseReference
@@ -178,7 +183,8 @@ class RequestFragment : Fragment() {
            // if (RootRef.child("Users").child(allusersID[position]).child("userState").) //HERKESIN USER STATE oLUNCA BAK
 
 
-            if (token.equals("received")) {
+
+            if (tokens[position].equals("received"))  {
                 accept_buton.setText("Accept")
                 accept_buton.setOnClickListener {
                     alert.setTitle("Exit")
@@ -210,7 +216,7 @@ class RequestFragment : Fragment() {
                 }
             }
 
-            if (token.equals("received")) {
+            if (tokens[position].equals("received"))  {
                 cancel_buton.isEnabled= true
                 cancel_buton.visibility=View.VISIBLE
 
@@ -245,22 +251,22 @@ class RequestFragment : Fragment() {
         }
 
         fun AcceptChatRequest(position: Int) {
-            RootRef.child("Contacts").child(currentUserID).child(receiverUserID[position]).child("contact")
+            RootRef.child("Contacts").child(currentUserID).child(allusersID[position]).child("contact")
                 .setValue("Saved")
                 .addOnCompleteListener(OnCompleteListener { task ->
                     if (task.isSuccessful){
 
-                        RootRef.child("Contacts").child(receiverUserID[position]).child(currentUserID).child("contact")
+                        RootRef.child("Contacts").child(allusersID[position]).child(currentUserID).child("contact")
                             .setValue("Saved")
                             .addOnCompleteListener(OnCompleteListener { task ->
                                 if (task.isSuccessful){
-                                    ChatRequestRef.child(currentUserID).child(receiverUserID[position]).removeValue().addOnCompleteListener(
+                                    ChatRequestRef.child(currentUserID).child(allusersID[position]).removeValue().addOnCompleteListener(
                                         OnCompleteListener { task ->
                                             if (task.isSuccessful){
-                                                ChatRequestRef.child(receiverUserID[position]).child(currentUserID).removeValue().addOnCompleteListener(
+                                                ChatRequestRef.child(allusersID[position]).child(currentUserID).removeValue().addOnCompleteListener(
                                                     OnCompleteListener { task ->
                                                         if (task.isSuccessful){
-                                                            Toast.makeText(context, "You and " + receiverUserID + " are friends ", Toast.LENGTH_LONG).show()
+                                                           // Toast.makeText(context, "You and " + receiverUserID + " are friends ", Toast.LENGTH_LONG).show()
                                                         }
 
                                                     })
@@ -278,10 +284,10 @@ class RequestFragment : Fragment() {
 
         }
         fun CancelChatRequest(position:Int){
-            ChatRequestRef.child(currentUserID).child(receiverUserID[position]).removeValue().addOnCompleteListener(
+            ChatRequestRef.child(currentUserID).child(allusersID[position]).removeValue().addOnCompleteListener(
                 OnCompleteListener { task ->
                     if (task.isSuccessful){
-                        ChatRequestRef.child(receiverUserID[position]).child(currentUserID).removeValue().addOnCompleteListener(
+                        ChatRequestRef.child(allusersID[position]).child(currentUserID).removeValue().addOnCompleteListener(
                             OnCompleteListener { task ->
                                 if (task.isSuccessful){
                                     Toast.makeText(context, "You deleted ", Toast.LENGTH_LONG).show()

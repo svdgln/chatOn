@@ -18,6 +18,7 @@
 
     </TextView>
 
+
     <TextView
         android:id="@+id/sender_message_text"
         android:layout_width="wrap_content"
