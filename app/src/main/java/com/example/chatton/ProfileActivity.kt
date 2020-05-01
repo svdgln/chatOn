@@ -4,29 +4,40 @@ package com.example.chatton
 
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.TextUtils
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.GenericTransitionOptions.with
 import com.bumptech.glide.Glide
+import com.bumptech.glide.Glide.with
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.squareup.picasso.MemoryPolicy
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_profile.*
 import java.io.File
+import java.io.IOException
 import java.net.URL
 
 
@@ -41,6 +52,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var profile_image: CircleImageView
     private lateinit var progressBar:ProgressDialog
     private lateinit var resultUri:Uri
+    private lateinit var filePath:StorageReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +86,7 @@ class ProfileActivity : AppCompatActivity() {
             UpdateProfile()
         }
 
-        RetrieveUserInfo()
+        RetrieveUserInfo(this@ProfileActivity)
 
     }
 
@@ -95,28 +107,34 @@ class ProfileActivity : AppCompatActivity() {
                 progressBar.show()
                 resultUri = result.uri
                 //profile_image.setImageURI(resultUri)
-                val filePath: StorageReference = UserProfileImage.child(currentUserID )
-                filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(applicationContext, "Profile Image Uploaded Successfully", Toast.LENGTH_LONG).show()
-                          val downloadUrl:String= task.getResult()?.getStorage()?.getDownloadUrl().toString()
-                            RootRef.child("Users").child(currentUserID).child("image")
-                                .setValue(downloadUrl)
-                                .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
-                                    if (task.isSuccessful) {
-                                        Toast.makeText(applicationContext, "Image Saved Successfully", Toast.LENGTH_LONG).show()
-                                        progressBar.dismiss()
-                                    }else{
-                                        Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
-                                        progressBar.dismiss()
-                                    }
-                                })
+                //task.result.storage?.downloadUrl.toString()
+                val filePath: StorageReference = UserProfileImage.child(currentUserID)
+                filePath.putFile(resultUri).addOnCompleteListener(this, OnCompleteListener<UploadTask.TaskSnapshot> {    task ->
+                    if (task.isSuccessful) {
+                        //Toast.makeText(applicationContext, task.result.toString(), Toast.LENGTH_LONG).show()
+                        //val downloadUrl= task.result.toString()
 
-                        }
+                        val value = task.result?.storage?.toString()
+                        val downloadUrl= "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/Profile%20Image%2F"+
+                                currentUserID.toString() + "?alt=media&"
+                        Toast.makeText(applicationContext, downloadUrl, Toast.LENGTH_LONG).show()
+                        RootRef.child("Users").child(currentUserID).child("image")
+                            .setValue(downloadUrl)
+                            .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
+                                if (task.isSuccessful) {
+                                   // Toast.makeText(applicationContext, "Image Saved Successfully", Toast.LENGTH_LONG).show()
+                                    progressBar.dismiss()
+                                }else{
+                                    Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+                                    progressBar.dismiss()
+                                }
+                            })
+
+                    }
                     else{
-                            Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
-                            progressBar.dismiss()
-                        }
+                        Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+                        progressBar.dismiss()
+                    }
                 })
             }
 
@@ -126,38 +144,70 @@ class ProfileActivity : AppCompatActivity() {
 
 
 
-    private fun RetrieveUserInfo() {
+    private fun RetrieveUserInfo(context: Context) {
         RootRef.child("Users").child(currentUserID)
             .addValueEventListener(object: ValueEventListener {
+                override fun onCancelled(p0: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists() && dataSnapshot.hasChild("name")) {
-                        val retrieveUserName = dataSnapshot.child("name").getValue().toString()
-                        val retrieveStatus = dataSnapshot.child("status").getValue().toString()
-                        val retrieveImage = dataSnapshot.child("image").getValue().toString()
-                        set_user_name.setText(retrieveUserName)
-                        set_profile_status.setText(retrieveStatus)
-                        //profile_image.setImageURI(resultUri)
+
+                        if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name") && (dataSnapshot.hasChild("image"))))
+                        {
+                            val retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                            val retrievesStatus = dataSnapshot.child("status").getValue().toString();
+                            val retrieveProfileImage = dataSnapshot.child("image").getValue().toString();
+
+                            set_user_name.setText(retrieveUserName);
+                            set_profile_status.setText(retrievesStatus);
+                            Picasso.get().load(retrieveProfileImage).into(set_profile_image);
+                        }
+                        else if ((dataSnapshot.exists()) && (dataSnapshot.hasChild("name")))
+                        {
+                            val retrieveUserName = dataSnapshot.child("name").getValue().toString();
+                            val retrievesStatus = dataSnapshot.child("status").getValue().toString();
+
+                            set_user_name.setText(retrieveUserName);
+                            set_profile_status.setText(retrievesStatus);
+                        }
+                        else
+                        {
+                            set_user_name.setVisibility(View.VISIBLE);
+                            Toast.makeText(context, "Please set & update your profile information...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+
+
+
+                        //val assetsBitmap: Bitmap? = getBitmapFromAssets(retrieveImage)
+                        //profile_image.setImageURI(retrieveImage)
+                       // profile_image.setImageBitmap(assetsBitmap)
                         //val path = UserProfileImage.child(currentUserID)
                         //Picasso.get().load(resultUri).resize(50, 50).centerCrop().into(profile_image)
-                        //Picasso.get().load(retrieveImage).into(set_profile_image);
+                        //Picasso.get().load(retrieveImage).into(set_profile_image)
                         //Picasso.with(applicationContext).load(imageUri).into(ivBasicImage);
                         //Glide.with(applicationContext).load(retrieveImage).into(profile_image)
 
-                    }
-                    else {
-                        val toast = Toast.makeText(applicationContext, "Please set your profile ", Toast.LENGTH_LONG)
-                        toast.show()
-                    }
-                }override fun onCancelled(error: DatabaseError) {
-                    //print error.message
-                }
+
             })
+    }
+
+    private fun getBitmapFromAssets(fileName: String): Bitmap? {
+        return try {
+            BitmapFactory.decodeStream(assets.open(fileName))
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
     }
 
     private fun UpdateProfile() {
         val username = set_user_name.text.toString()
         val setStatus = set_profile_status.text.toString()
         val profile = resultUri.toString() + ".png"
+       // val profile =
         if (TextUtils.isEmpty(username)) {
             val toast = Toast.makeText(applicationContext, "Please Write Your Name ", Toast.LENGTH_LONG)
             toast.show()
@@ -171,7 +221,7 @@ class ProfileActivity : AppCompatActivity() {
                 hashMap.put("uid",currentUserID)
                 hashMap.put("name",username)
                 hashMap.put("status",setStatus)
-                hashMap.put("image" , profile )
+              //  hashMap.put("image" , profile )
             RootRef.child("Users").child(currentUserID).setValue(hashMap)
                 .addOnCompleteListener(
                 OnCompleteListener { task ->

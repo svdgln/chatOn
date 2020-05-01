@@ -180,9 +180,11 @@ class RequestActivity : AppCompatActivity() {
                         ContactsRef.child(receiverUserID).child(currentUserID).child("contact").setValue("Saved")
                             .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
                                 if (task.isSuccessful) {
-                                    ChatRequestRef.child(currentUserID).child(receiverUserID).removeValue().addOnCompleteListener(this, OnCompleteListener<Void> { task ->
+                                    ChatRequestRef.child(currentUserID).child(receiverUserID).removeValue()
+                                        .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
                                         if (task.isSuccessful) {
-                                            ChatRequestRef.child(receiverUserID).child(currentUserID).removeValue().addOnCompleteListener(this, OnCompleteListener<Void> { task ->
+                                            ChatRequestRef.child(receiverUserID).child(currentUserID).removeValue()
+                                                .addOnCompleteListener(this, OnCompleteListener<Void> { task ->
                                                 send_request_buton.isEnabled=true
                                                 current_state = "friends"
                                                 send_request_buton.setText("Remove This Contact")

@@ -25,7 +25,7 @@ class GroupFragment : Fragment() {
         }
     }
 
-    private lateinit var RootRef: DatabaseReference
+    private lateinit var GroupRef: DatabaseReference
     var arrayList = ArrayList<String>()
     //private lateinit var Adapter: ArrayAdapter<String>
     override fun onCreateView(
@@ -34,7 +34,7 @@ class GroupFragment : Fragment() {
     ): View? {
 
         val view: View = inflater.inflate(R.layout.fragment_group, container, false)
-        RootRef = FirebaseDatabase.getInstance().reference.child("Group")
+        GroupRef = FirebaseDatabase.getInstance().reference.child("Group")
         val listview = view.findViewById<ListView>(R.id.list_view)
         RetrieveAndDisplayGroup(listview,inflater.context)
 
@@ -49,7 +49,7 @@ class GroupFragment : Fragment() {
     }
 
     private fun RetrieveAndDisplayGroup(listview: ListView, context: Context) {
-        RootRef.addValueEventListener(object : ValueEventListener {
+        GroupRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val iterator = dataSnapshot.children.iterator()
                 var set = HashSet<String>()
@@ -71,13 +71,9 @@ class GroupFragment : Fragment() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val layoutInflater:LayoutInflater = LayoutInflater.from(mCtx)
             val view:View = layoutInflater.inflate(resources, null)
-
             val titleTextView: TextView = view.findViewById(R.id.text1)
-
-
             var mItem: String = items[position]
             titleTextView.text = mItem
-
             return view
         }
     }

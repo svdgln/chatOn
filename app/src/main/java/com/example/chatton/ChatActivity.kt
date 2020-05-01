@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColor
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -24,7 +27,10 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var MessegeRef: DatabaseReference
     var sendMessage = ArrayList<String>()
     var receivedMessage = ArrayList<String>()
+    var Allmessages = ArrayList<String>()
     lateinit var listview: ListView
+    lateinit var file_buton:Button
+    lateinit var image_buton:Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +52,8 @@ class ChatActivity : AppCompatActivity() {
         RootRef = FirebaseDatabase.getInstance().reference
         MessegeRef = FirebaseDatabase.getInstance().reference.child("Messages").child(currentUserID)
         listview = findViewById<ListView>(R.id.list_view)
+        file_buton = findViewById(R.id.file_buton)
+
 
         buton.setOnClickListener{
             sendMessege()
@@ -133,16 +141,17 @@ class ChatActivity : AppCompatActivity() {
                 receivedMessage.add(message)
             }
 
-        }
+            Allmessages.add(message)
 
-        listview.adapter = ChatActivity.Adapter(this, R.layout.custom_messages, sendMessage , receivedMessage)
+        }
+        listview.adapter = ChatActivity.Adapter(this, R.layout.custom_messages, sendMessage , receivedMessage , Allmessages)
         listview.post(Runnable { listview.setSelection(listview.getCount() - 1) })
 
         //listview.smoothScrollToPosition(5);
 
     }
 
-    class Adapter(var mCtx: Context, var resources: Int, var send: List<String>, var resend: List<String>) :
+    class Adapter(var mCtx: Context, var resources: Int, var send: List<String>, var received: List<String> , var all: List<String>) :
         ArrayAdapter<String>(mCtx, resources, send) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val layoutInflater: LayoutInflater = LayoutInflater.from(mCtx)
@@ -150,20 +159,74 @@ class ChatActivity : AppCompatActivity() {
 
             val sendMessage: TextView = view.findViewById(R.id.sender_message_text)
             val receivedMessage: TextView = view.findViewById(R.id.receiver_message_text)
+            var index1:Int = 0
+            var index2:Int = 0
 
+            if (!all.isEmpty()) {
+                if (!send.isEmpty() && position < send.size) {
+                    var mItem: String = send[position]
+                    sendMessage.text = mItem
+                    index1 += 1
+                }
 
-            if (!send.isEmpty() && position < send.size) {
-                var mItem: String = send[position] ///CUNKU POSITON LIST GET CEKIYORUZ OYLE BIR KULLANICI YOK HATA DONUYOR.
-                sendMessage.text = mItem
-            }
+                  if (!received.isEmpty() && position < received.size) {
 
-            if (!resend.isEmpty()&& position < resend.size) {
-
-                var mItem2: String = resend[position] //POSITION OLARAK DONUNCE KAFASI KARISIYOR.
-                receivedMessage.text = mItem2
+                    var mItem2: String = received[position]
+                    receivedMessage.text = mItem2
+                    index2 += 1
+                }
             }
 
             return view
         }
     }
+
 }
+
+
+/*
+
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recyclerView.adapter = Adapter(getModels())
+
+    class Adapter(val messages: MutableList<MessageList>) : RecyclerView.Adapter<Adapter.ModelViewHolder>() {
+        private lateinit var userMessageList:List<MessageList>
+        private lateinit var mAuth: FirebaseAuth
+        private lateinit var userRef:DatabaseReference
+
+        class ModelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val sendMessage: TextView = view.findViewById(R.id.sender_message_text)
+            val receivedMessage: TextView = view.findViewById(R.id.receiver_message_text)
+
+            fun bindItems(item: MessageList) {
+                sendMessage.setText(item.send)
+                receivedMessage.setText(item.received)
+            }
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.custom_messages, parent, false)
+
+            mAuth = FirebaseAuth.getInstance()
+
+            return ModelViewHolder(view)
+        }
+
+        override fun getItemCount(): Int {
+            return messages.size
+        }
+
+        override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
+
+            val messageSenderID = mAuth.currentUser?.uid
+            val messages = userMessageList.get(po)
+
+            holder.bindItems(messages.get(position))
+        }
+
+    }
+
+ */
+
+
+

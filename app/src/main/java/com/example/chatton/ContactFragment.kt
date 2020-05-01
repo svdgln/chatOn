@@ -47,8 +47,8 @@ class ContactFragment : Fragment() {
     private fun RetrieveAndDisplayGroup(listview: ListView, context: Context) {
         RootRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val currentuserID = auth.currentUser?.uid
-                val iterator = dataSnapshot.child("Contacts").children.iterator()
+                val currentuserID:String = auth.currentUser!!.uid
+                val iterator = dataSnapshot.child("Contacts").child(currentuserID).children.iterator()
                 var ListName = ArrayList<String>()
                 var ListID = ArrayList<String>()
                 while (iterator.hasNext()) {
