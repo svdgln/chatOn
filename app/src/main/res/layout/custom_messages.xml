@@ -4,7 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/receiver_message_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp">
 
+    </ImageView>
     <TextView
         android:id="@+id/receiver_message_text"
         android:layout_width="wrap_content"
@@ -19,6 +26,15 @@
 
     </TextView>
 
+    <ImageView
+        android:id="@+id/sender_message_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:padding="10dp">
+
+    </ImageView>
 
     <TextView
         android:id="@+id/sender_message_text"

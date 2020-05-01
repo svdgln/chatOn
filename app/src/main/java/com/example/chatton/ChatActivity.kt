@@ -1,7 +1,12 @@
 package com.example.chatton
 
+import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
@@ -10,17 +15,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColor
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.StorageTask
+import com.google.firebase.storage.UploadTask
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_chat.*
 
+@Suppress("DEPRECATION")
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var MessengerUserName: String
@@ -31,6 +44,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var RootRef: DatabaseReference
     private lateinit var GroupRef: DatabaseReference
     private lateinit var MessegeRef: DatabaseReference
+    private lateinit var UserProfileImage: StorageReference
     var sendMessage = ArrayList<String>()
     var receivedMessage = ArrayList<String>()
     var Allmessages = ArrayList<String>()
@@ -39,7 +53,11 @@ class ChatActivity : AppCompatActivity() {
     lateinit var image_buton: Button
     var messagList = ArrayList<Messages>()
     lateinit var messageAdapter: MessageAdapter
-
+    var checker:String = ""
+    var myUrl:String = ""
+    private lateinit var fileUri:Uri
+    private lateinit var uploadTask: UploadTask
+    private lateinit var progressBar: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -56,6 +74,7 @@ class ChatActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         MessageSenderID = auth.currentUser!!.uid
         UserRef = FirebaseDatabase.getInstance().reference.child("Users")
+        UserProfileImage = FirebaseStorage.getInstance().reference.child("Image Files")
         RootRef = FirebaseDatabase.getInstance().reference
         MessegeRef =
             FirebaseDatabase.getInstance().reference.child("Messages").child(MessageSenderID)
@@ -66,13 +85,114 @@ class ChatActivity : AppCompatActivity() {
         userMessageList.layoutManager = LinearLayoutManager(this)
         userMessageList.adapter = messageAdapter
 
+        progressBar = ProgressDialog(this)
         file_buton = findViewById(R.id.file_buton)
+        file_buton.setOnClickListener(View.OnClickListener {
+            var options = arrayOf<CharSequence>("Image" , "PDF Files" , "Ms Word Files")
+
+            val alert = AlertDialog.Builder(this)
+            alert.setTitle("Select the File")
+            alert.setCancelable(false);
+            alert.setIcon(R.drawable.ic_child_care_black_24dp);
+
+            alert.setItems(options,DialogInterface.OnClickListener { dialogInterface, i ->
+                if (i == 0) {
+                    checker = "image"
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.setType("image/*")
+                    startActivityForResult(Intent.createChooser(intent, "select image"),438)
+                }
+                if (i == 1) {
+                    checker = "pdf"
+                }
+                if (i == 2) {
+                    checker = "docx"
+                }
+            })
+
+            alert.show()
+
+        })
 
 
         buton.setOnClickListener {
             sendMessege()
         }
 
+    }
+
+    @Override
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode==438 && resultCode == Activity.RESULT_OK && data != null && data.data != null) {
+            progressBar.setTitle("Sending Image")
+            progressBar.setMessage("We are sending image..")
+            progressBar.setCanceledOnTouchOutside(false)
+            progressBar.show()
+            fileUri = data.data!!
+            if (!checker.equals("image")) {
+
+            }
+            else if (checker.equals("image")) {
+                val storageReference:StorageReference= FirebaseStorage.getInstance().reference.child("Image Files")
+
+                val messegeSenderRef = "Messages/" + MessageSenderID + "/" + MessengerReceiverID
+                val messegeReceiverRef = "Messages/" + MessengerReceiverID + "/" + MessageSenderID
+
+                val userMessageKeyRef: DatabaseReference =
+                    RootRef.child("Messages").child(MessageSenderID).child(MessengerReceiverID).push()
+                val messagePushID: String = userMessageKeyRef.key.toString()
+
+                val filepath:StorageReference = storageReference.child(messagePushID )
+                uploadTask = filepath.putFile(fileUri)
+                uploadTask.continueWith { task ->
+                    if (!task.isSuccessful){
+                        throw task.exception!!
+                    }
+                    return@continueWith filepath.downloadUrl
+                }.addOnCompleteListener(OnCompleteListener {task ->
+                    if (task.isSuccessful) {
+                        val downloadUri: Task<Uri>? = task.result
+                       // myUrl = downloadUri.toString()
+
+                        myUrl = "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/Image%20Files%2F" +
+                                messagePushID.toString()+ "?alt=media&"
+
+
+                        var messageTextBody: HashMap<String, String> = HashMap<String, String>()
+                        messageTextBody.put("message", myUrl )
+                        messageTextBody.put("name", fileUri.lastPathSegment!!)
+                        messageTextBody.put("type", checker)
+                        messageTextBody.put("from", MessageSenderID)
+
+                        var messageBodyDetail: HashMap<String, Any> = HashMap<String, Any>()
+                        messageBodyDetail.put(messegeSenderRef + "/" + messagePushID, messageTextBody)
+                        messageBodyDetail.put(messegeReceiverRef + "/" + messagePushID, messageTextBody)
+
+                        RootRef.updateChildren(messageBodyDetail)
+                            .addOnCompleteListener(OnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    progressBar.dismiss()
+                                    Toast.makeText(applicationContext, "Message sent", Toast.LENGTH_LONG).show()
+                                }else{
+                                    progressBar.dismiss()
+                                    Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+                                }
+                                //edit_text.setText("")
+
+                            })
+                            edit_text.setText("")
+
+                    }
+                })
+
+            }
+            else{
+                progressBar.dismiss()
+                Toast.makeText(this, "Nothing Selected, Error", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private fun sendMessege() {
@@ -180,6 +300,8 @@ class ChatActivity : AppCompatActivity() {
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             var receiver_message = itemView.findViewById<TextView>(R.id.receiver_message_text)
             var sender_message = itemView.findViewById<TextView>(R.id.sender_message_text)
+            var receiver_image:ImageView = itemView.findViewById(R.id.receiver_message_picture)
+            var sender_image:ImageView = itemView.findViewById(R.id.sender_message_picture)
 
         }
 
@@ -214,6 +336,8 @@ class ChatActivity : AppCompatActivity() {
             })
             if (fromUserMessageType.equals("text")) {
                 holder.receiver_message.visibility = View.INVISIBLE
+                holder.receiver_image.visibility = View.INVISIBLE
+                holder.sender_image.visibility = View.INVISIBLE
 
                 if (fromUserID.equals(messageSenderID)) {
                     holder.sender_message.setBackgroundResource(R.drawable.sender_messages)
@@ -228,10 +352,18 @@ class ChatActivity : AppCompatActivity() {
                     holder.receiver_message.setText(message.message)
                 }
             }
+            else if(fromUserMessageType.equals("image")){
+                holder.receiver_message.visibility=View.INVISIBLE
+                holder.sender_message.visibility=View.INVISIBLE
 
-
-            //holder.receiver_message.text = contact.send
-            //holder.sender_message.text = contact.received
+                if (fromUserID.equals(messageSenderID)){
+                    holder.sender_image.visibility = View.VISIBLE
+                    Picasso.get().load(message.message).into(holder.sender_image)
+                } else{
+                    holder.receiver_image.visibility = View.VISIBLE
+                    Picasso.get().load(message.message).into(holder.receiver_image)
+                }
+            }
 
         }
 
@@ -241,49 +373,6 @@ class ChatActivity : AppCompatActivity() {
 }
 
 
-/*
-
-        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = Adapter(getModels())
-
-    class Adapter(val messages: MutableList<MessageList>) : RecyclerView.Adapter<Adapter.ModelViewHolder>() {
-        private lateinit var userMessageList:List<MessageList>
-        private lateinit var mAuth: FirebaseAuth
-        private lateinit var userRef:DatabaseReference
-
-        class ModelViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val sendMessage: TextView = view.findViewById(R.id.sender_message_text)
-            val receivedMessage: TextView = view.findViewById(R.id.receiver_message_text)
-
-            fun bindItems(item: MessageList) {
-                sendMessage.setText(item.send)
-                receivedMessage.setText(item.received)
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModelViewHolder {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.custom_messages, parent, false)
-
-            mAuth = FirebaseAuth.getInstance()
-
-            return ModelViewHolder(view)
-        }
-
-        override fun getItemCount(): Int {
-            return messages.size
-        }
-
-        override fun onBindViewHolder(holder: ModelViewHolder, position: Int) {
-
-            val messageSenderID = mAuth.currentUser?.uid
-            val messages = userMessageList.get(po)
-
-            holder.bindItems(messages.get(position))
-        }
-
-    }
-
- */
 
 
 
