@@ -44,10 +44,10 @@ class MainActivity : AppCompatActivity() {
 
         //FRAGMENT PART
         val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.view, ChatsFragment())
+        fragmentTransaction.replace(R.id.view, chatFragment())
         fragmentTransaction.commit()
         chat_buton.setOnClickListener {
-            changeFragment(ChatsFragment()) }
+            changeFragment(chatFragment()) }
         group_buton.setOnClickListener {
             changeFragment(GroupFragment()) }
         contact_buton.setOnClickListener {

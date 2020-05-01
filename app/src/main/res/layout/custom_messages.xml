@@ -14,7 +14,8 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:textSize="14sp"
-        android:textStyle="bold">
+        android:textStyle="bold"
+        android:text="Receiver Messages">
 
     </TextView>
 
@@ -29,7 +30,8 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:textSize="14sp"
-        android:textStyle="bold">
+        android:textStyle="bold"
+        android:text="Sender Messages">
 
     </TextView>
 
