@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_find_friend.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -28,6 +29,7 @@ class FindFriendActivity : AppCompatActivity() {
     var arrayListName = ArrayList<String>()
     var arrayListStatus = ArrayList<String>()
     var arrayListUserID = ArrayList<String>()
+    var arrayListUserImage = ArrayList<String>()
     private lateinit var auth: FirebaseAuth
     private lateinit var UserID:String
 
@@ -60,12 +62,22 @@ class FindFriendActivity : AppCompatActivity() {
                 val iterator = dataSnapshot.children.iterator()
                 var ListName = ArrayList<String>()
                 var ListStatus = ArrayList<String>()
+                var ListImage = ArrayList<String>()
                 var ListUserID = ArrayList<String>()
                 while (iterator.hasNext()) {
                     iterator.next().key?.let {
                         ListName.add(dataSnapshot.child(it).child("name").getValue().toString())
                         ListStatus.add(dataSnapshot.child(it).child("status").getValue().toString())
                         ListUserID.add(it)
+
+                        if (dataSnapshot.child(it).hasChild("image")) {
+                            ListImage.add(
+                                dataSnapshot.child(it).child("image").getValue()
+                                    .toString()
+                            )
+                        } else{
+                            ListImage.add("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a")
+                        }
                     }
                 }
                 arrayListName.clear()
@@ -73,14 +85,15 @@ class FindFriendActivity : AppCompatActivity() {
                 arrayListName.addAll(ListName)
                 arrayListStatus.addAll(ListStatus)
                 arrayListUserID.addAll(ListUserID)
-                listview.adapter = Adapter(context, R.layout.user_display_layout, arrayListName , arrayListStatus)
+                arrayListUserImage.addAll(ListImage)
+                listview.adapter = Adapter(context, R.layout.user_display_layout, arrayListName , arrayListStatus , arrayListUserImage)
                 //   Adapter.notifyDataSetChanged()
             }
             override fun onCancelled(p0: DatabaseError) {
                 TODO("Not yet implemented")
             }
         })}
-        class Adapter(var mCtx: Context, var resources: Int, var itemName: List<String> , var itemStatus: List<String>) :
+        class Adapter(var mCtx: Context, var resources: Int, var itemName: List<String> , var itemStatus: List<String> , var itemImage: List<String>) :
         ArrayAdapter<String>(mCtx, resources, itemName) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val layoutInflater: LayoutInflater = LayoutInflater.from(mCtx)
@@ -97,6 +110,9 @@ class FindFriendActivity : AppCompatActivity() {
                 titleTextView.text = mItem
                 var mItemStatus:String=itemStatus[position]
                 subtitleTextView.text= mItemStatus
+
+                var mItemImage:String = itemImage[position]
+                Picasso.get().load(mItemImage).into(profileImage)
                 return view
             }
         }

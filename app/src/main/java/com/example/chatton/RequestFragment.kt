@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_request.*
 
 /**
@@ -23,6 +25,7 @@ class RequestFragment : Fragment() {
 
     var arrayListName = ArrayList<String>()
     var arrayListStatus = ArrayList<String>()
+    var arrayListImage = ArrayList<String>()
     var sendRequestName = ArrayList<String>()
     var sendRequestStatus = ArrayList<String>()
     var currentIDList = ArrayList<String>()
@@ -61,8 +64,7 @@ class RequestFragment : Fragment() {
                 val iterator = dataSnapshot.child("Chat Requests").child(currentuserID.toString()).children.iterator()
                 var ListName = ArrayList<String>()
                 var ListStatus = ArrayList<String>()
-                var sendName = ArrayList<String>()
-                var sendStatus = ArrayList<String>()
+                var ListImage = ArrayList<String>()
                 var currentID = ArrayList<String>()
                 var receiverID = ArrayList<String>()
                 var allusersID = ArrayList<String>()
@@ -86,6 +88,14 @@ class RequestFragment : Fragment() {
                              //   token = "received"
                                 token.add("received")
 
+                                if (dataSnapshot.child("Users").child(it).hasChild("image")) {
+                                    ListImage.add(dataSnapshot.child("Users").child(it).child("image").getValue()
+                                        .toString())
+                                }
+                                else{
+                                    ListImage.add("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a")
+                                }
+
                             }
 
                         if (dataSnapshot.child("Chat Requests").child(currentuserID.toString()).child(it).child("Request_Type")
@@ -104,6 +114,14 @@ class RequestFragment : Fragment() {
                            // token = "sent"
                             token.add("sent")
 
+                            if (dataSnapshot.child("Users").child(it).hasChild("image")) {
+                                ListImage.add(dataSnapshot.child("Users").child(it).child("image").getValue()
+                                    .toString())
+                            }
+                            else{
+                                ListImage.add("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a")
+                            }
+
                         }
                     }
 
@@ -113,6 +131,7 @@ class RequestFragment : Fragment() {
                     arrayListStatus.clear()
                     arrayListName.addAll(ListName)
                     arrayListStatus.addAll(ListStatus)
+                    arrayListImage.addAll(ListImage)
                     currentIDList.addAll(currentID)
                     allUsersID.addAll(allusersID)
                     tokens.addAll(token)
@@ -121,6 +140,7 @@ class RequestFragment : Fragment() {
                         R.layout.request,
                         arrayListName,
                         arrayListStatus,
+                        arrayListImage,
                         currentIDList ,
                         "received",
                         allUsersID,
@@ -128,30 +148,13 @@ class RequestFragment : Fragment() {
                     )
                 }
 
-                /*
-                if(!sendName.isEmpty()) {
-                    sendRequestName.clear()
-                    sendRequestStatus.clear()
-                    sendRequestName.addAll(sendName)
-                    sendRequestStatus.addAll(sendStatus)
-                    receiverIDList.addAll(receiverID)
-                    listview.adapter = Adapter(
-                        context,
-                        R.layout.request,
-                        sendRequestName,
-                        sendRequestStatus,
-                        receiverIDList ,
-                        "sent"
-                    )
-                }*/
-                //   Adapter.notifyDataSetChanged()
             }
             override fun onCancelled(p0: DatabaseError) {
                 TODO("Not yet implemented")
             }
         })}
 
-    class Adapter(var mCtx: Context, var resources: Int, var name: List<String> , var status: List<String> , var receiverUserID: List<String> ,
+    class Adapter(var mCtx: Context, var resources: Int, var name: List<String> , var status: List<String> , var image: List<String>, var receiverUserID: List<String> ,
                   var token:String, var allusersID:List<String> , var tokens:List<String>) :
         ArrayAdapter<String>(mCtx, resources, name) {
 
@@ -171,6 +174,7 @@ class RequestFragment : Fragment() {
             val buton_state:ImageView= view.findViewById(R.id.state)
             val accept_buton: Button = view.findViewById(R.id.accept_buton)
             val cancel_buton: Button = view.findViewById(R.id.cancel_buton)
+            val profile_image:CircleImageView=view.findViewById(R.id.profile_image)
 
             ChatRequestRef = FirebaseDatabase.getInstance().reference.child("Chat Requests")
             ContactsRef = FirebaseDatabase.getInstance().reference.child("Contacts")
@@ -244,6 +248,8 @@ class RequestFragment : Fragment() {
             titleTextView.text = mItem
             var mItem2: String= status[position]
             subtitleTextView.text = mItem2
+            var mItem3:String=image[position]
+            Picasso.get().load(mItem3).into(profile_image)
 
 
 
@@ -268,20 +274,13 @@ class RequestFragment : Fragment() {
                                                         if (task.isSuccessful){
                                                            // Toast.makeText(context, "You and " + receiverUserID + " are friends ", Toast.LENGTH_LONG).show()
                                                         }
-
                                                     })
                                             }
-
                                         })
-
-
                                 }
                             })
-
                     }
                 })
-
-
         }
         fun CancelChatRequest(position:Int){
             ChatRequestRef.child(currentUserID).child(allusersID[position]).removeValue().addOnCompleteListener(

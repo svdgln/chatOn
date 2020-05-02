@@ -11,6 +11,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.UploadTask
+import com.squareup.picasso.Picasso
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_request.*
 
 class RequestActivity : AppCompatActivity() {
@@ -25,6 +27,7 @@ class RequestActivity : AppCompatActivity() {
     private lateinit var currentUserID:String
     private lateinit var auth: FirebaseAuth
     private lateinit var receiverUserID:String
+    private lateinit var visit_profile_image:CircleImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,7 @@ class RequestActivity : AppCompatActivity() {
 
         userName = findViewById<TextView>(R.id.visit_user_name)
         userStatus = findViewById<TextView>(R.id.visit_user_status)
+        visit_profile_image=findViewById(R.id.visit_profile_image)
         val sendRequestButon:Button= findViewById<Button>(R.id.send_request_buton)
         val declineRequestButon:Button= findViewById<Button>(R.id.decline_request_buton)
         current_state = "new"
@@ -53,8 +57,17 @@ class RequestActivity : AppCompatActivity() {
                     if (dataSnapshot.exists() && dataSnapshot.hasChild("name")) {
                         val name:String= dataSnapshot.child("name").getValue().toString()
                         val status:String= dataSnapshot.child("status").getValue().toString()
+                        val image: String
+                        if (dataSnapshot.hasChild("image")) {
+                            image = dataSnapshot.child("image").getValue().toString()
+                        }
+                        else{
+                            image = "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a"
+                        }
                         userName.setText(name)
                         userStatus.setText(status)
+
+                        Picasso.get().load(image).into(visit_profile_image)
                         ManageChatRequest()
                     } } })
     }

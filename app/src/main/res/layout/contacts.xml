@@ -43,6 +43,7 @@
                     android:textStyle="bold"></TextView>
 
                 <ImageView
+                    android:id="@+id/online_buton"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:background="@drawable/ic_fiber_manual_record_black_24dp"
@@ -60,8 +61,20 @@
                 android:textAlignment="textStart"
                 android:gravity="start"></TextView>
 
+            <TextView
+                android:id="@+id/lastSeen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textAlignment="textStart"
+                android:gravity="start">
+
+            </TextView>
+
 
         </LinearLayout>
+
+
 
     </LinearLayout>
 

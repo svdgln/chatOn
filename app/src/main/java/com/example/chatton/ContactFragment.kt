@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 /**
@@ -24,6 +25,8 @@ class ContactFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     var arrayListName = ArrayList<String>()
     var arrayListID = ArrayList<String>()
+    var arrayListStatus = ArrayList<String>()
+    var arrayListImage = ArrayList<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,21 +53,36 @@ class ContactFragment : Fragment() {
                 val currentuserID:String = auth.currentUser!!.uid
                 val iterator = dataSnapshot.child("Contacts").child(currentuserID).children.iterator()
                 var ListName = ArrayList<String>()
+                var ListStatus = ArrayList<String>()
+                var ListImage = ArrayList<String>()
                 var ListID = ArrayList<String>()
                 while (iterator.hasNext()) {
                     val i =0
                     iterator.next().key?.let {
                         if (!it.equals(currentuserID)) {
                             ListName.add(dataSnapshot.child("Users").child(it).child("name").getValue().toString())
+                            ListStatus.add(dataSnapshot.child("Users").child(it).child("status").getValue().toString())
                             ListID.add(dataSnapshot.child("Users").child(it).child("uid").getValue().toString())
+                            if (dataSnapshot.child("Users").child(it).hasChild("image")) {
+                                ListImage.add(
+                                    dataSnapshot.child("Users").child(it).child("image").getValue()
+                                        .toString()
+                                )
+                            } else{
+                                ListImage.add("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a")
+                            }
                         }
                     }
                 }
                 arrayListName.clear()
                 arrayListID.clear()
+                arrayListStatus.clear()
+                arrayListImage.clear()
                 arrayListName.addAll(ListName)
                 arrayListID.addAll(ListID)
-                listview.adapter = Adapter(context, R.layout.user_display_layout, arrayListName , arrayListID)
+                arrayListStatus.addAll(ListStatus)
+                arrayListImage.addAll(ListImage)
+                listview.adapter = Adapter(context, R.layout.user_display_layout, arrayListName , arrayListID, arrayListStatus , arrayListImage)
                 //   Adapter.notifyDataSetChanged()
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -72,7 +90,7 @@ class ContactFragment : Fragment() {
             }
         })}
 
-    class Adapter(var mCtx: Context, var resources: Int, var itemName: List<String> , var itemID: List<String> ) :
+    class Adapter(var mCtx: Context, var resources: Int, var itemName: List<String> , var itemID: List<String> , var itemStatus: List<String> ,var itemImage: List<String> ) :
         ArrayAdapter<String>(mCtx, resources, itemName) {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val layoutInflater: LayoutInflater = LayoutInflater.from(mCtx)
@@ -87,8 +105,20 @@ class ContactFragment : Fragment() {
             }
 
             val titleTextView: TextView = view.findViewById(R.id.text)
+            val subTextView: TextView = view.findViewById(R.id.subtext)
+            val profile_image: CircleImageView = view.findViewById(R.id.profile_image)
+
+
+
             var mItem: String = itemName[position]
             titleTextView.text = mItem
+
+            var mItemS: String = itemStatus[position]
+            subTextView.text = mItemS
+
+            var mItemI: String = itemImage[position]
+            Picasso.get().load(mItemI).into(profile_image)
+
             return view
         }
     }

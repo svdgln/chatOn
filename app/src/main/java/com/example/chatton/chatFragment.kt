@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.view.menu.ActionMenuItemView
@@ -76,8 +78,17 @@ class chatFragment : Fragment() {
                             else{
                                 image = "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/download.png?alt=media&token=fb8f8243-496e-4422-bf82-8b32173dfb8a"
                             }
+                            var state:String = ""
+                            var date:String = ""
+                            var time:String = ""
+                            if (dataSnapshot.child("Users").child(it).child("userState").hasChild("state")){
+                                state = dataSnapshot.child("Users").child(it).child("userState").child("state").getValue().toString()
+                                date = dataSnapshot.child("Users").child(it).child("userState").child("date").getValue().toString()
+                                time = dataSnapshot.child("Users").child(it).child("userState").child("time").getValue().toString()
+                            }
 
-                            contacts.add(ContactList(uid,name, status, image))
+
+                            contacts.add(ContactList(uid,name, status, image , state,date,time))
 
                         }
                     }
@@ -105,7 +116,7 @@ class chatFragment : Fragment() {
 
 }
 
-data class ContactList(val uid:String, val name: String, val status: String, val image: String){
+data class ContactList(val uid:String, val name: String, val status: String, val image: String , val state:String, val date:String,val time:String){
 
 
 }
@@ -113,10 +124,16 @@ data class ContactList(val uid:String, val name: String, val status: String, val
 class CustomAdapter(val userList:ArrayList<ContactList> , val context: Context):
     RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
+    private lateinit var RootRef:DatabaseReference
+    private var currentUser = FirebaseAuth.getInstance().currentUser
+    private lateinit var auth: FirebaseAuth
+
     class ViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView){
         var textViewName =itemView.findViewById<TextView>(R.id.text_name)
         var textViewStatus =itemView.findViewById<TextView>(R.id.text_status)
         var profileImage =itemView.findViewById<CircleImageView>(R.id.profile_image)
+        var lastSeen:TextView= itemView.findViewById(R.id.lastSeen)
+        var online_buton:ImageView=itemView.findViewById(R.id.online_buton)
 
     }
 
@@ -130,18 +147,37 @@ class CustomAdapter(val userList:ArrayList<ContactList> , val context: Context):
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        RootRef = FirebaseDatabase.getInstance().reference
         val contact:ContactList= userList[position]
 
         holder.textViewName.text = contact.name
         holder.textViewStatus.text = contact.status
-        Picasso.get().load(contact.image).into(holder.profileImage);
 
+        Picasso.get().load(contact.image).into(holder.profileImage);
         holder.itemView.setOnClickListener(View.OnClickListener {
                 val intent = Intent(context, ChatActivity::class.java)
                 intent.putExtra("name", contact.name)
                 intent.putExtra("uid", contact.uid)
                 context.startActivity(intent)
         })
+
+
+        if (contact.state.equals("online")){
+            holder.lastSeen.setText("online")
+            holder.online_buton.visibility = View.VISIBLE
+
+        }
+        else{
+            holder.online_buton.visibility = View.INVISIBLE
+            holder.lastSeen.setText("offline\n " + "Last Seen: "  + contact.date + contact.time )
+        }
+
+
+
+
+
+
 
     }
 
