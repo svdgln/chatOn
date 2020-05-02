@@ -1,17 +1,12 @@
 package com.example.chatton
 
-import android.app.DownloadManager
 import android.content.Context
-import android.content.ContextWrapper
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -20,7 +15,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
@@ -29,16 +23,15 @@ import com.squareup.picasso.Picasso
 import jp.wasabeef.picasso.transformations.BlurTransformation
 import jp.wasabeef.picasso.transformations.ColorFilterTransformation
 import java.io.*
-import java.lang.Exception
 import java.lang.ref.WeakReference
-import java.util.*
-import java.util.jar.Manifest
 
 
+@Suppress("DEPRECATION")
 class ImageViewActivity : AppCompatActivity() {
 
     lateinit var imageUrl:String
     lateinit var copyImage:String
+    lateinit var image_viewer:ImageView
     var height:Int = 0
     var width:Int = 0
     lateinit var newImage:Bitmap
@@ -58,7 +51,7 @@ class ImageViewActivity : AppCompatActivity() {
         val black_filter:ImageView=findViewById(R.id.black_filter)
         val white_filter:ImageView=findViewById(R.id.white_filter)
 
-        val image_viewer= findViewById<ImageView>(R.id.image_viewer)
+        image_viewer= findViewById<ImageView>(R.id.image_viewer)
         imageUrl = intent.getStringExtra("url")
         Picasso.get().load(imageUrl).into(image_viewer)
 
@@ -119,123 +112,32 @@ class ImageViewActivity : AppCompatActivity() {
         })
 
         download_buton.setOnClickListener(View.OnClickListener {
-            DownloadAndSaveImageTask(this).execute(imageUrl)
-
-
-
-
-
-
-
-            /*
-            val bitmap:Bitmap= (image_viewer.getDrawable() as BitmapDrawable).bitmap
-            val filepath: File = Environment.getDownloadCacheDirectory()
-            val dir:File = (filepath.absoluteFile) as File
-            dir.mkdirs()
-            val imagename:String = imageUrl + ".PNG"
-            var file = File(dir,imagename)
-            val out:OutputStream
-
+            val bitmap:Bitmap = (image_viewer.getDrawable() as BitmapDrawable).bitmap
+            var file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
+            file = File(file, "ChattOnPictures")
+            file.mkdirs()
+            val index = file.listFiles().size+1
+            var newFile = File(file, "image" + index.toString() + ".png")
+            val os: OutputStream
             try {
-
-                out = FileOutputStream(file)
-                bitmap.compress(Bitmap.CompressFormat.PNG,100,out)
-                out.flush()
-                out.close()
-
-            }catch (e:Exception) {
-
+                os = FileOutputStream(newFile)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+                val toast= Toast.makeText(this,"Image Saved",Toast.LENGTH_LONG).show()
+                os.flush()
+                os.close()
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace()
+                val toast= Toast.makeText(this,"Error File",Toast.LENGTH_LONG).show()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                val toast= Toast.makeText(this,"Error",Toast.LENGTH_LONG).show()
             }
-
-             */
-
         })
 
 
 
 
     }
-
-    class DownloadAndSaveImageTask(context: Context) : AsyncTask<String, Unit, Unit>() {
-        private var mContext: WeakReference<Context> = WeakReference(context)
-
-        override fun doInBackground(vararg params: String?) {
-            val url = params[0]
-            val requestOptions = RequestOptions().override(100)
-                .downsample(DownsampleStrategy.CENTER_INSIDE)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-
-            mContext.get()?.let {
-                val bitmap = Glide.with(it)
-                    .asBitmap()
-                    .load(url)
-                    .apply(requestOptions)
-                    .submit()
-                    .get()
-
-                try {
-                    var file = it.getDir("Images", Context.MODE_PRIVATE)
-                    if (!file.exists()) {
-                        file.mkdir()
-                    }
-                    file = File(file, "img.png")
-                    val out = FileOutputStream(file)
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 85, out)
-                    out.flush()
-                    out.close()
-                    Log.i("Seiggailion", "Image saved.")
-
-                } catch (e: Exception) {
-                    Log.i("Seiggailion", "Failed to save image.")
-                }
-            }
-        }
-    }
-
-    private fun saveImageToInternalStorage(drawableId:Int):Uri{
-        // Get the image from drawable resource as drawable object
-        val drawable = ContextCompat.getDrawable(applicationContext,drawableId)
-
-        // Get the bitmap from drawable object
-        val bitmap = (drawable as BitmapDrawable).bitmap
-
-        // Get the context wrapper instance
-        val wrapper = ContextWrapper(applicationContext)
-
-        // Initializing a new file
-        // The bellow line return a directory in internal storage
-        var file = wrapper.getDir("images", Context.MODE_PRIVATE)
-
-
-        // Create a file to save the image
-        file = File(file, "${UUID.randomUUID()}.jpg")
-
-        try {
-            // Get the file output stream
-            val stream: OutputStream = FileOutputStream(file)
-
-            // Compress bitmap
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-
-            // Flush the stream
-            stream.flush()
-
-            // Close stream
-            stream.close()
-        } catch (e: IOException){ // Catch the exception
-            e.printStackTrace()
-        }
-
-        // Return the saved image uri
-        return Uri.parse(file.absolutePath)
-    }
-
-
-
-
-
-
 }
 
 
