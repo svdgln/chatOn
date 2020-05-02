@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_rounded"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ImageViewActivity"></activity>
+        <activity android:name=".ChatActivity" />
         <activity
             android:name=".RequestActivity"
             android:parentActivityName=".FindFriendActivity" />

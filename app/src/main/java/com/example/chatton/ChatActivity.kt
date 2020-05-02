@@ -156,6 +156,8 @@ class ChatActivity : AppCompatActivity() {
                         messageTextBody.put("name", fileUri.lastPathSegment!!)
                         messageTextBody.put("type", checker)
                         messageTextBody.put("from", MessageSenderID)
+                        messageTextBody.put("to",MessengerReceiverID)
+                        messageTextBody.put("messageID",messagePushID)
 
                         var messageBodyDetail: HashMap<String, Any> = HashMap<String, Any>()
                         messageBodyDetail.put(messegeSenderRef + "/" + messagePushID, messageTextBody)
@@ -206,6 +208,8 @@ class ChatActivity : AppCompatActivity() {
                         messageTextBody.put("name", fileUri.lastPathSegment!!)
                         messageTextBody.put("type", checker)
                         messageTextBody.put("from", MessageSenderID)
+                        messageTextBody.put("to",MessengerReceiverID)
+                        messageTextBody.put("messageID",messagePushID)
 
                         var messageBodyDetail: HashMap<String, Any> = HashMap<String, Any>()
                         messageBodyDetail.put(messegeSenderRef + "/" + messagePushID, messageTextBody)
@@ -253,7 +257,8 @@ class ChatActivity : AppCompatActivity() {
             messageTextBody.put("message", mesegeText)
             messageTextBody.put("type", "text")
             messageTextBody.put("from", MessageSenderID)
-            // messageTextBody.put("to",MessengerReceiverID)
+            messageTextBody.put("to",MessengerReceiverID)
+            messageTextBody.put("messageID",messagePushID)
 
             var messageBodyDetail: HashMap<String, Any> = HashMap<String, Any>()
             messageBodyDetail.put(messegeSenderRef + "/" + messagePushID, messageTextBody)
@@ -296,7 +301,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
             override fun onChildRemoved(datasnapshot: DataSnapshot) {
-                TODO("Not yet implemented")
+                RetrieveAndDisplayGroup(userMessageList , this@ChatActivity)
             }
         })
     }
@@ -314,7 +319,9 @@ class ChatActivity : AppCompatActivity() {
                             val message =
                                 dataSnapshot.child(it).child("message").getValue().toString()
                             val type = dataSnapshot.child(it).child("type").getValue().toString()
-                            messagList.add(Messages(from, message, type))
+                            val to = dataSnapshot.child(it).child("to").getValue().toString()
+                            val messageID = dataSnapshot.child(it).child("messageID").getValue().toString()
+                            messagList.add(Messages(from, message, type , to,messageID))
 
                     }
                 }
@@ -328,7 +335,7 @@ class ChatActivity : AppCompatActivity() {
         })}
 
 
-    data class Messages(val from: String, val message: String, val type: String) {
+    data class Messages(val from: String, val message: String, val type: String , val to:String , val messageID:String) {
 
     }
 
@@ -392,46 +399,279 @@ class ChatActivity : AppCompatActivity() {
                     holder.receiver_message.setTextColor(Color.BLACK)
                     holder.receiver_message.setText(message.message)
                 }
-            }
-            else if(fromUserMessageType.equals("image")){
-                holder.receiver_message.visibility=View.INVISIBLE
-                holder.sender_message.visibility=View.INVISIBLE
+            } else if (fromUserMessageType.equals("image")) {
+                holder.receiver_message.visibility = View.INVISIBLE
+                holder.sender_message.visibility = View.INVISIBLE
 
-                if (fromUserID.equals(messageSenderID)){
+                if (fromUserID.equals(messageSenderID)) {
                     holder.sender_image.visibility = View.VISIBLE
                     Picasso.get().load(message.message).into(holder.sender_image)
-                } else{
+                } else {
                     holder.receiver_image.visibility = View.VISIBLE
                     Picasso.get().load(message.message).into(holder.receiver_image)
                 }
             }
-            else{
-                holder.receiver_message.visibility=View.INVISIBLE
-                holder.sender_message.visibility=View.INVISIBLE
+            else if (fromUserMessageType.equals("pdf") || fromUserMessageType.equals("docx")) {
+                holder.receiver_message.visibility = View.INVISIBLE
+                holder.sender_message.visibility = View.INVISIBLE
 
-                if (fromUserID.equals(messageSenderID)){
+                if (fromUserID.equals(messageSenderID)) {
                     holder.sender_image.visibility = View.VISIBLE
-                    holder.sender_image.setBackgroundResource(R.drawable.ic_attachment_black_24dp)
-
-                    holder.itemView.setOnClickListener(View.OnClickListener {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).message))
-                        holder.itemView.context.startActivity(intent)
-                    })
-                }
-                else{
+                    Picasso.get()
+                        .load("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/file.png?alt=media&token=8b6b5ff9-f2ac-47b3-8cfd-370991e398b4")
+                        .into(holder.sender_image)
+                } else {
                     holder.receiver_image.visibility = View.VISIBLE
-                    holder.receiver_image.setBackgroundResource(R.drawable.ic_attachment_black_24dp)
-
-                    holder.itemView.setOnClickListener(View.OnClickListener {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).message))
-                        holder.itemView.context.startActivity(intent)
-                    })
+                    Picasso.get()
+                        .load("https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/file.png?alt=media&token=8b6b5ff9-f2ac-47b3-8cfd-370991e398b4")
+                        .into(holder.receiver_image)
                 }
             }
 
+            if (fromUserID.equals(messageSenderID)) {
+               holder.itemView.setOnClickListener(View.OnClickListener {
+                    if (userMessageList.get(position).type.equals("text")) {
+                        var options = arrayOf<CharSequence>(
+                            "Delete For Me",
+                            "Cancel",
+                            "Delete For Everyone"
+                        )
+
+                        val alert2 = AlertDialog.Builder(holder.itemView.context)
+                        alert2.setTitle("Delete Message")
+                        alert2.setCancelable(false);
+                        alert2.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                        alert2.setItems(
+                            options,
+                            DialogInterface.OnClickListener { dialogInterface, i ->
+                                if (i == 0) {
+                                    deleteSendMessages(position,holder)
+                                } else if (i == 2) {
+                                    deleteMessagesForEveyone(position,holder)
+                                }
+                            })
+
+                        alert2.show()
+
+                    }
+
+                     else if (userMessageList.get(position).type.equals("pdf") || userMessageList.get(position).type.equals("docx") ) {
+                       var options = arrayOf<CharSequence>(
+                           "Delete For Me",
+                           "Download and View This Document",
+                           "Cancel",
+                           "Delete For Everyone"
+                       )
+
+                       val alert1 = AlertDialog.Builder(holder.itemView.context)
+                       alert1.setTitle("Delete Message")
+                       alert1.setCancelable(false);
+                       alert1.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                       alert1.setItems(
+                           options,
+                           DialogInterface.OnClickListener { dialogInterface, i ->
+                               if (i == 0) {
+                                   deleteSendMessages(position,holder)
+                               } else if (i == 1) {
+                                   val intent = Intent(
+                                       Intent.ACTION_VIEW,
+                                       Uri.parse(userMessageList.get(position).message)
+                                   )
+                                   holder.itemView.context.startActivity(intent)
+                               } else if (i == 3) {
+                                   deleteMessagesForEveyone(position,holder)
+
+                               }
+                           })
+
+                       alert1.show()
+
+                   }
+
+                   else if (userMessageList.get(position).type.equals("image")) {
+                       var options = arrayOf<CharSequence>(
+                           "Delete For Me",
+                           "Show Picture",
+                           "Cancel",
+                           "Delete For Everyone"
+                       )
+
+                       val alert3 = AlertDialog.Builder(holder.itemView.context)
+                       alert3.setTitle("Delete Message")
+                       alert3.setCancelable(false);
+                       alert3.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                       alert3.setItems(
+                           options,
+                           DialogInterface.OnClickListener { dialogInterface, i ->
+                               if (i == 0) {
+                                   deleteSendMessages(position,holder)
+
+                               }
+                               else if (i == 1){
+                                   val intent = Intent(holder.itemView.context, ImageViewActivity::class.java)
+                                   intent.putExtra("url",userMessageList.get(position).message)
+                                   holder.itemView.context.startActivity(intent)
+                               }
+                               else if (i == 3) {
+                                   deleteMessagesForEveyone(position,holder)
+
+                               }
+                           })
+
+                       alert3.show()
+                    }
+                })
+            }
+
+            else{
+
+                holder.itemView.setOnClickListener(View.OnClickListener {
+                    if (userMessageList.get(position).type.equals("text")) {
+                        var options = arrayOf<CharSequence>(
+                            "Delete For Me",
+                            "Cancel"
+                        )
+
+                        val alert2 = AlertDialog.Builder(holder.itemView.context)
+                        alert2.setTitle("Delete Message")
+                        alert2.setCancelable(false);
+                        alert2.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                        alert2.setItems(
+                            options,
+                            DialogInterface.OnClickListener { dialogInterface, i ->
+                                if (i == 0) {
+                                    deleteReceivedMessages(position,holder)
+
+                                }
+                            })
+
+                        alert2.show()
+
+                    }
+
+                    else if (userMessageList.get(position).type.equals("pdf") || userMessageList.get(position).type.equals("docx") ) {
+                        var options = arrayOf<CharSequence>(
+                            "Delete For Me",
+                            "Download and View This Document",
+                            "Cancel"
+                        )
+
+                        val alert1 = AlertDialog.Builder(holder.itemView.context)
+                        alert1.setTitle("Delete Message")
+                        alert1.setCancelable(false);
+                        alert1.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                        alert1.setItems(
+                            options,
+                            DialogInterface.OnClickListener { dialogInterface, i ->
+                                if (i == 0) {
+                                    deleteReceivedMessages(position,holder)
+
+                                } else if (i == 1) {
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse(userMessageList.get(position).message)
+                                    )
+                                    holder.itemView.context.startActivity(intent)
+                                }
+                            })
+
+                        alert1.show()
+
+                    }
+
+                    else if (userMessageList.get(position).type.equals("image")) {
+                        var options = arrayOf<CharSequence>(
+                            "Delete For Me",
+                            "Show Picture",
+                            "Cancel"
+                        )
+
+                        val alert3 = AlertDialog.Builder(holder.itemView.context)
+                        alert3.setTitle("Delete Message")
+                        alert3.setCancelable(false);
+                        alert3.setIcon(R.drawable.ic_child_care_black_24dp);
+
+                        alert3.setItems(
+                            options,
+                            DialogInterface.OnClickListener { dialogInterface, i ->
+                                if (i == 0) {
+                                    deleteReceivedMessages(position,holder)
+
+                                }
+                                else if (i == 1){
+                                    val intent = Intent(holder.itemView.context, ImageViewActivity::class.java)
+                                    intent.putExtra("url",userMessageList.get(position).message)
+                                    holder.itemView.context.startActivity(intent)
+                                }
+
+                            })
+
+                        alert3.show()
+                    }
+                })
+            }
         }
 
+        fun deleteSendMessages( position:Int ,  holder:ViewHolder){
+            val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
+            rootRef.child("Messages").child(userMessageList.get(position).from)
+                .child(userMessageList.get(position).to)
+                .child(userMessageList.get(position).messageID)
+                .removeValue().addOnCompleteListener(OnCompleteListener {task ->
+                    if (task.isSuccessful){
+                        Toast.makeText(holder.itemView.context, "Deleted Successfully", Toast.LENGTH_LONG).show()
+                    }
+                    else{
+                        Toast.makeText(holder.itemView.context, "Error", Toast.LENGTH_LONG).show()
+                    }
+                })
 
+        }
+
+        fun deleteReceivedMessages( position:Int ,  holder:ViewHolder){
+            val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
+            rootRef.child("Messages").child(userMessageList.get(position).to)
+                .child(userMessageList.get(position).from)
+                .child(userMessageList.get(position).messageID)
+                .removeValue().addOnCompleteListener(OnCompleteListener {task ->
+                    if (task.isSuccessful){
+                        Toast.makeText(holder.itemView.context, "Deleted Successfully", Toast.LENGTH_LONG).show()
+                    }
+                    else{
+                        Toast.makeText(holder.itemView.context, "Error", Toast.LENGTH_LONG).show()
+                    }
+                })
+
+        }
+
+        fun deleteMessagesForEveyone( position:Int ,  holder:ViewHolder){
+            val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
+            rootRef.child("Messages").child(userMessageList.get(position).to)
+                .child(userMessageList.get(position).from)
+                .child(userMessageList.get(position).messageID)
+                .removeValue().addOnCompleteListener(OnCompleteListener {task ->
+                    if (task.isSuccessful){
+                        rootRef.child("Messages").child(userMessageList.get(position).from)
+                            .child(userMessageList.get(position).to)
+                            .child(userMessageList.get(position).messageID)
+                            .removeValue().addOnCompleteListener(OnCompleteListener { task ->
+                                if (task.isSuccessful){
+                                    Toast.makeText(holder.itemView.context, "Deleted Successfully", Toast.LENGTH_LONG).show()
+                                }
+                            })
+
+                    }
+                    else{
+                        Toast.makeText(holder.itemView.context, "Error", Toast.LENGTH_LONG).show()
+                    }
+                })
+
+        }
     }
 
 }
