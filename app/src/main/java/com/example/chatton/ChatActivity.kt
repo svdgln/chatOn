@@ -22,13 +22,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.StorageTask
-import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.*
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_chat.*
@@ -104,9 +102,15 @@ class ChatActivity : AppCompatActivity() {
                 }
                 if (i == 1) {
                     checker = "pdf"
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.setType("application/pdf")
+                    startActivityForResult(Intent.createChooser(intent, "select pdf file"),438)
                 }
                 if (i == 2) {
                     checker = "docx"
+                    val intent = Intent(Intent.ACTION_GET_CONTENT)
+                    intent.setType("application/msword")
+                    startActivityForResult(Intent.createChooser(intent, "select ms word file"),438)
                 }
             })
 
@@ -132,6 +136,43 @@ class ChatActivity : AppCompatActivity() {
             progressBar.show()
             fileUri = data.data!!
             if (!checker.equals("image")) {
+
+                val storageReference:StorageReference= FirebaseStorage.getInstance().reference.child("Document Files")
+
+                val messegeSenderRef = "Messages/" + MessageSenderID + "/" + MessengerReceiverID
+                val messegeReceiverRef = "Messages/" + MessengerReceiverID + "/" + MessageSenderID
+
+                val userMessageKeyRef: DatabaseReference =
+                    RootRef.child("Messages").child(MessageSenderID).child(MessengerReceiverID).push()
+                val messagePushID: String = userMessageKeyRef.key.toString()
+
+                val filepath:StorageReference = storageReference.child(messagePushID )
+                filepath.putFile(fileUri).addOnCompleteListener(OnCompleteListener {task ->
+                    if (task.isSuccessful) {
+
+                        var messageTextBody: HashMap<String, String> = HashMap<String, String>()
+                        messageTextBody.put("message", "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/Document%20Files%2F" +
+                                messagePushID.toString()+ "?alt=media&" )
+                        messageTextBody.put("name", fileUri.lastPathSegment!!)
+                        messageTextBody.put("type", checker)
+                        messageTextBody.put("from", MessageSenderID)
+
+                        var messageBodyDetail: HashMap<String, Any> = HashMap<String, Any>()
+                        messageBodyDetail.put(messegeSenderRef + "/" + messagePushID, messageTextBody)
+                        messageBodyDetail.put(messegeReceiverRef + "/" + messagePushID, messageTextBody)
+
+                        RootRef.updateChildren(messageBodyDetail)
+                        progressBar.dismiss()
+
+
+                    }
+                }).addOnFailureListener(OnFailureListener {
+                    progressBar.dismiss()
+                    Toast.makeText(this, "Nothing Selected, Error", Toast.LENGTH_SHORT).show();
+                }).addOnProgressListener { OnProgressListener<UploadTask.TaskSnapshot> {
+                    val p:Double = (100.0 * it.bytesTransferred) / it.totalByteCount
+                    progressBar.setMessage(p.toString() + " % Uploading...")
+                } }
 
             }
             else if (checker.equals("image")) {
@@ -362,6 +403,29 @@ class ChatActivity : AppCompatActivity() {
                 } else{
                     holder.receiver_image.visibility = View.VISIBLE
                     Picasso.get().load(message.message).into(holder.receiver_image)
+                }
+            }
+            else{
+                holder.receiver_message.visibility=View.INVISIBLE
+                holder.sender_message.visibility=View.INVISIBLE
+
+                if (fromUserID.equals(messageSenderID)){
+                    holder.sender_image.visibility = View.VISIBLE
+                    holder.sender_image.setBackgroundResource(R.drawable.ic_attachment_black_24dp)
+
+                    holder.itemView.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).message))
+                        holder.itemView.context.startActivity(intent)
+                    })
+                }
+                else{
+                    holder.receiver_image.visibility = View.VISIBLE
+                    holder.receiver_image.setBackgroundResource(R.drawable.ic_attachment_black_24dp)
+
+                    holder.itemView.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(userMessageList.get(position).message))
+                        holder.itemView.context.startActivity(intent)
+                    })
                 }
             }
 
