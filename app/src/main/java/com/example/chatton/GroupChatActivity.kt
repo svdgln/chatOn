@@ -32,7 +32,6 @@ class GroupChatActivity : AppCompatActivity() {
 
         //DEFINITON
         val buton = findViewById<Button>(R.id.buton)
-     //   val text = findViewById<TextView>(R.id.text)
         val edit_text = findViewById<TextView>(R.id.edit_text)
         val currentGroupName = intent.extras?.get("Group Name").toString()
         Toast.makeText(applicationContext, "You Entered " + currentGroupName + " Group", Toast.LENGTH_LONG).show()
@@ -46,6 +45,7 @@ class GroupChatActivity : AppCompatActivity() {
         GroupRef = FirebaseDatabase.getInstance().reference.child("Group").child(currentGroupName)
         getUserInfo()
 
+        //when you click the buton:
         buton.setOnClickListener{
             val messege = edit_text.text.toString()
             val messageKey = GroupRef.push().key
@@ -60,6 +60,9 @@ class GroupChatActivity : AppCompatActivity() {
                 val simpleTimeFormat = SimpleDateFormat("hh:mm a")
                 currentTime = simpleTimeFormat.format(ccalForTime.time)
 
+                //we added GroupMessages in the Firebase.
+                //These messages include name,message,date and time
+                //These messages child of Group Root.
                 var groupMassege : HashMap<String, Any> = HashMap<String, Any> ()
                 GroupRef.updateChildren(groupMassege)
                 GroupMessegeRef = GroupRef.child(messageKey.toString())
@@ -81,6 +84,7 @@ class GroupChatActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        //When this Acrivity open, firstly check there any message.
          GroupRef.addChildEventListener(object : ChildEventListener {
              override fun onCancelled(p0: DatabaseError) {
                  TODO("Not yet implemented")
@@ -110,7 +114,6 @@ class GroupChatActivity : AppCompatActivity() {
 
     private fun DisplayMessage(dataSnapshot: DataSnapshot) {
         val iterator = dataSnapshot.children.iterator()
-
         while (iterator.hasNext()) {
             val chatDate = iterator.next().getValue().toString()
             val chatMessage = iterator.next().getValue().toString()

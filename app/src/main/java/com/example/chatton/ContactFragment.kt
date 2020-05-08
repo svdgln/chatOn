@@ -33,6 +33,7 @@ class ContactFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        //we create values
         val view: View = inflater.inflate(R.layout.fragment_contact, container, false)
         ContactRef = FirebaseDatabase.getInstance().reference.child("Contacts")
         RootRef = FirebaseDatabase.getInstance().reference
@@ -46,7 +47,8 @@ class ContactFragment : Fragment() {
 
         return view
     }
-
+    //we call the Contacts Root in the Firebase.
+    //and we added these Contacts in ArrayLists.
     private fun RetrieveAndDisplayGroup(listview: ListView, context: Context) {
         RootRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -82,6 +84,7 @@ class ContactFragment : Fragment() {
                 arrayListID.addAll(ListID)
                 arrayListStatus.addAll(ListStatus)
                 arrayListImage.addAll(ListImage)
+                //we call adapter to show ArrayLists like a list.
                 listview.adapter = Adapter(context, R.layout.user_display_layout, arrayListName , arrayListID, arrayListStatus , arrayListImage)
                 //   Adapter.notifyDataSetChanged()
             }

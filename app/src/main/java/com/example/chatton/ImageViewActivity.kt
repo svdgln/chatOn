@@ -40,7 +40,7 @@ class ImageViewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_view)
-
+        //DEFINITION
         val download_buton:Button= findViewById(R.id.download_buton)
         val orginal_filter:ImageView=findViewById(R.id.orginal_filter)
         val blur_filter:ImageView=findViewById(R.id.blur_filter)
@@ -50,11 +50,11 @@ class ImageViewActivity : AppCompatActivity() {
         val green_filter:ImageView=findViewById(R.id.green_filter)
         val black_filter:ImageView=findViewById(R.id.black_filter)
         val white_filter:ImageView=findViewById(R.id.white_filter)
-
+        //pu image in the imageview.
         image_viewer= findViewById<ImageView>(R.id.image_viewer)
         imageUrl = intent.getStringExtra("url")
         Picasso.get().load(imageUrl).into(image_viewer)
-
+        //make filter and pu the same image in the imageView.
         Glide.with(this).load(imageUrl).into(orginal_filter);
         Picasso.get().load(imageUrl).transform(BlurTransformation(this, 25, 1)).into(blur_filter)
         Picasso.get().load(imageUrl).transform(ColorFilterTransformation(Color.argb(90,255,0,0))).into(color_red_filter)
@@ -68,9 +68,7 @@ class ImageViewActivity : AppCompatActivity() {
         val filter =  ColorMatrixColorFilter(colorMatrix);
         grayscale_filter.colorFilter = filter;
 
-
-
-
+        //When you click these imageViews, the main imageView will be seen like them:
         orginal_filter.setOnClickListener(View.OnClickListener {
             Glide.with(this).clear(image_viewer)
             Glide.with(this).load(imageUrl).into(image_viewer);
@@ -110,14 +108,17 @@ class ImageViewActivity : AppCompatActivity() {
             Picasso.get().load(imageUrl).transform(ColorFilterTransformation(Color.argb(90,255,255,255))).into(image_viewer)
 
         })
-
+        //When you click the download buton, this image will be download to you phone.
         download_buton.setOnClickListener(View.OnClickListener {
             val bitmap:Bitmap = (image_viewer.getDrawable() as BitmapDrawable).bitmap
-            var file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM)
-            file = File(file, "ChattOnPictures")
+            var file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) //This image saved in DCIM directory.
+            file = File(file, "ChattOnPictures") //This image will be save in ChattOnPictures directory.
             file.mkdirs()
             val index = file.listFiles().size+1
             var newFile = File(file, "image" + index.toString() + ".png")
+            //So, this image's path: in DCIM/ChattOnPictures/image1.png
+            //if there in an image the second image's path will be :
+            //DCIM/ChattOnPictures/image2.png
             val os: OutputStream
             try {
                 os = FileOutputStream(newFile)
@@ -140,6 +141,8 @@ class ImageViewActivity : AppCompatActivity() {
     }
 }
 
+//Below the code is about filtering. This filter code long way to do grayscale.
+//But, we did it easy way with Picasso and Glide libraries.
 
 /*
 
@@ -173,33 +176,4 @@ if (width > 0 && height > 0) {
 else{
     grey_filter.setImageBitmap(newImage)
 }
-*/            /*
-            if (width > 0 && height > 0) {
-
-                for (i in 0..width!!) {
-                    for (j in 0..height!!) {
-                        val oldPixel: Int = newImage.getPixel(i, j)
-                        val oldRed: Int = Color.red(oldPixel)
-                        val oldBlue: Int = Color.blue(oldPixel)
-                        val oldGreen: Int = Color.green(oldPixel)
-                        val oldAlpha: Int = Color.alpha(oldPixel)
-
-                        val intensity: Int = (oldRed + oldBlue + oldGreen) / 3
-                        val newRed: Int = intensity
-                        val newBlue: Int = intensity
-                        val newGreen: Int = intensity
-
-                        val newPixel: Int = Color.argb(oldAlpha, newRed, newGreen, newBlue)
-                        val newBitmap: Bitmap = newImage
-                        newBitmap.setPixel(i, j, newPixel)
-
-                        grey_filter.setImageBitmap(newBitmap)
-
-                    }
-                }
-
-            }
-            else{
-                grey_filter.setImageBitmap(newImage)
-            }
 */

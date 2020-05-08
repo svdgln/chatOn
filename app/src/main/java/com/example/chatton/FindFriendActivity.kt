@@ -37,12 +37,13 @@ class FindFriendActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_friend)
         setTitle("Find Friend")
-
+        //we create values
         auth = FirebaseAuth.getInstance()
         RootRef = FirebaseDatabase.getInstance().reference.child("Users")
         val listview = findViewById<ListView>(R.id.listView)
         RetrieveAndDisplayGroup(listview,this)
 
+        //when you click list's item, you go to RequestActivity with userID value
         listview.setOnItemClickListener { parent, view, position, id ->
             val User = parent.getItemAtPosition(position)
             for (i in 0 until arrayListName.size) {
@@ -55,7 +56,7 @@ class FindFriendActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
+    //we called Users root children in the firebase.
     private fun RetrieveAndDisplayGroup(listview: ListView, context: Context) {
         RootRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -93,6 +94,7 @@ class FindFriendActivity : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         })}
+        //We created a adapter to show list's elements.
         class Adapter(var mCtx: Context, var resources: Int, var itemName: List<String> , var itemStatus: List<String> , var itemImage: List<String>) :
         ArrayAdapter<String>(mCtx, resources, itemName) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {

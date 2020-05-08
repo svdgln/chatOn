@@ -130,7 +130,7 @@ class PhoneLogin : AppCompatActivity() {
 
 
 }
-
+    //You can login with your phone with signInWithPhoneAuthCredential() method easily.
     private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->

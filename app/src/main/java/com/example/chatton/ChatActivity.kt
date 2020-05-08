@@ -63,10 +63,12 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        //get name and id from ChatFragment class
         MessengerUserName = intent.extras?.get("name").toString()
         MessengerReceiverID = intent.extras?.get("uid").toString()
         setTitle(MessengerUserName)
 
+        //create variables
         val buton = findViewById<Button>(R.id.buton)
         val edit_text = findViewById<EditText>(R.id.edit_text)
         auth = FirebaseAuth.getInstance()
@@ -78,21 +80,26 @@ class ChatActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().reference.child("Messages").child(MessageSenderID)
                 .child(MessengerReceiverID)
 
+        //go to messageAdapter with arrayList that is messageList
         messageAdapter = MessageAdapter(messagList)
         userMessageList = findViewById<RecyclerView>(R.id.chats_list)
         userMessageList.layoutManager = LinearLayoutManager(this)
         userMessageList.adapter = messageAdapter
 
+        //create Dialog
         progressBar = ProgressDialog(this)
         file_buton = findViewById(R.id.file_buton)
+        //click the file buton
         file_buton.setOnClickListener(View.OnClickListener {
             var options = arrayOf<CharSequence>("Image" , "PDF Files" , "Ms Word Files")
 
+            //Prepare Dialog
             val alert = AlertDialog.Builder(this)
             alert.setTitle("Select the File")
             alert.setCancelable(false);
             alert.setIcon(R.drawable.ic_child_care_black_24dp);
 
+            //when you click the dialog's item
             alert.setItems(options,DialogInterface.OnClickListener { dialogInterface, i ->
                 if (i == 0) {
                     checker = "image"
@@ -150,6 +157,7 @@ class ChatActivity : AppCompatActivity() {
                 filepath.putFile(fileUri).addOnCompleteListener(OnCompleteListener {task ->
                     if (task.isSuccessful) {
 
+                        //create new child for firebase. This child under the Message root
                         var messageTextBody: HashMap<String, String> = HashMap<String, String>()
                         messageTextBody.put("message", "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/Document%20Files%2F" +
                                 messagePushID.toString()+ "?alt=media&" )
@@ -197,8 +205,7 @@ class ChatActivity : AppCompatActivity() {
                 }.addOnCompleteListener(OnCompleteListener {task ->
                     if (task.isSuccessful) {
                         val downloadUri: Task<Uri>? = task.result
-                       // myUrl = downloadUri.toString()
-
+                        //create URL
                         myUrl = "https://firebasestorage.googleapis.com/v0/b/chattondatabase.appspot.com/o/Image%20Files%2F" +
                                 messagePushID.toString()+ "?alt=media&"
 
@@ -242,7 +249,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun sendMessege() {
         val mesegeText: String = edit_text.text.toString()
-
+        //when you send a message it will be upload in firebase. This message will be under the Message root
         if (TextUtils.isEmpty(mesegeText)) {
             Toast.makeText(applicationContext, "Please write a messege", Toast.LENGTH_LONG).show()
         } else run {
@@ -280,6 +287,8 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        //OnStart() method special method for Android Studio.
+        //When you open the ChatActivity this method activated firstly.
         MessegeRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 TODO("Not yet implemented")
@@ -294,7 +303,8 @@ class ChatActivity : AppCompatActivity() {
                     // DisplayMessage(datasnapshot)
                 }
             }
-
+            //When we open the ChatActivty the messages will be seen.
+            //So we have to call them with RetrieveAndDisplayGroup method
             override fun onChildAdded(datasnapshot: DataSnapshot, p1: String?) {
                 RetrieveAndDisplayGroup(userMessageList , this@ChatActivity)
 
@@ -307,6 +317,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun RetrieveAndDisplayGroup(chatList: RecyclerView, context: Context) {
+        //We go to Firebase's Message root and call the root's childs.
         MessegeRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val currentuserID:String = auth.currentUser!!.uid
@@ -334,14 +345,14 @@ class ChatActivity : AppCompatActivity() {
             }
         })}
 
-
+    //We created a data class for Adapter
     data class Messages(val from: String, val message: String, val type: String , val to:String , val messageID:String) {
 
     }
 
     class MessageAdapter(val userMessageList: ArrayList<Messages>) :
         RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
-
+        //In this Adapter we added ArrayList elements in the RecyclerView
         private lateinit var auth: FirebaseAuth
         private lateinit var UserRef: DatabaseReference
 
@@ -382,6 +393,8 @@ class ChatActivity : AppCompatActivity() {
                 }
 
             })
+            //There is three options. These are text,image and pdf.
+            //If the message is text:
             if (fromUserMessageType.equals("text")) {
                 holder.receiver_message.visibility = View.INVISIBLE
                 holder.receiver_image.visibility = View.INVISIBLE
@@ -399,6 +412,7 @@ class ChatActivity : AppCompatActivity() {
                     holder.receiver_message.setTextColor(Color.BLACK)
                     holder.receiver_message.setText(message.message)
                 }
+                //If the message is image:
             } else if (fromUserMessageType.equals("image")) {
                 holder.receiver_message.visibility = View.INVISIBLE
                 holder.sender_message.visibility = View.INVISIBLE
@@ -411,6 +425,7 @@ class ChatActivity : AppCompatActivity() {
                     Picasso.get().load(message.message).into(holder.receiver_image)
                 }
             }
+            //If the message is pdf or docx
             else if (fromUserMessageType.equals("pdf") || fromUserMessageType.equals("docx")) {
                 holder.receiver_message.visibility = View.INVISIBLE
                 holder.sender_message.visibility = View.INVISIBLE
@@ -427,7 +442,8 @@ class ChatActivity : AppCompatActivity() {
                         .into(holder.receiver_image)
                 }
             }
-
+            //When you click the messages:
+            // -If the message is send and that is a text:
             if (fromUserID.equals(messageSenderID)) {
                holder.itemView.setOnClickListener(View.OnClickListener {
                     if (userMessageList.get(position).type.equals("text")) {
@@ -455,7 +471,7 @@ class ChatActivity : AppCompatActivity() {
                         alert2.show()
 
                     }
-
+                     //If the message is Send and that is pdf
                      else if (userMessageList.get(position).type.equals("pdf") || userMessageList.get(position).type.equals("docx") ) {
                        var options = arrayOf<CharSequence>(
                            "Delete For Me",
@@ -489,7 +505,7 @@ class ChatActivity : AppCompatActivity() {
                        alert1.show()
 
                    }
-
+                    //If the message is send and that is image:
                    else if (userMessageList.get(position).type.equals("image")) {
                        var options = arrayOf<CharSequence>(
                            "Delete For Me",
@@ -527,7 +543,7 @@ class ChatActivity : AppCompatActivity() {
             }
 
             else{
-
+                //If the message is received and that is text
                 holder.itemView.setOnClickListener(View.OnClickListener {
                     if (userMessageList.get(position).type.equals("text")) {
                         var options = arrayOf<CharSequence>(
@@ -552,7 +568,7 @@ class ChatActivity : AppCompatActivity() {
                         alert2.show()
 
                     }
-
+                    //If the message is received and that is pdf
                     else if (userMessageList.get(position).type.equals("pdf") || userMessageList.get(position).type.equals("docx") ) {
                         var options = arrayOf<CharSequence>(
                             "Delete For Me",
@@ -583,7 +599,7 @@ class ChatActivity : AppCompatActivity() {
                         alert1.show()
 
                     }
-
+                    //If the message is received and that is image
                     else if (userMessageList.get(position).type.equals("image")) {
                         var options = arrayOf<CharSequence>(
                             "Delete For Me",
@@ -616,7 +632,8 @@ class ChatActivity : AppCompatActivity() {
                 })
             }
         }
-
+        //when you delete a send message, it will be go Firebase's Message root firstly.
+        //After, it will be delete this message with removeValue() method.
         fun deleteSendMessages( position:Int ,  holder:ViewHolder){
             val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
             rootRef.child("Messages").child(userMessageList.get(position).from)
@@ -632,7 +649,8 @@ class ChatActivity : AppCompatActivity() {
                 })
 
         }
-
+        //when you delete a send message, it will be go Firebase's Message root firstly.
+        //After, it will be delete this message with removeValue() method.
         fun deleteReceivedMessages( position:Int ,  holder:ViewHolder){
             val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
             rootRef.child("Messages").child(userMessageList.get(position).to)
@@ -648,7 +666,8 @@ class ChatActivity : AppCompatActivity() {
                 })
 
         }
-
+        //when you delete a send message, it will be go Firebase's Message root firstly.
+        //After, it will be delete this message with removeValue() method.
         fun deleteMessagesForEveyone( position:Int ,  holder:ViewHolder){
             val rootRef:DatabaseReference= FirebaseDatabase.getInstance().reference
             rootRef.child("Messages").child(userMessageList.get(position).to)

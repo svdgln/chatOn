@@ -40,7 +40,7 @@ class chatFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_chat, container, false)
-
+        //Create values
         val chatList:RecyclerView = view.findViewById(R.id.chats_list)
         chatList.layoutManager = LinearLayoutManager(context)
         RootRef = FirebaseDatabase.getInstance().reference
@@ -55,7 +55,8 @@ class chatFragment : Fragment() {
 
         return view
     }
-
+    //First we go to the Firebase's Contact Root and learned which users are in contact.
+    //After, we call these Users in the User Root.
     private fun RetrieveAndDisplayGroup(chatList: RecyclerView, context: Context) {
         RootRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -94,6 +95,7 @@ class chatFragment : Fragment() {
                     }
                 }
                 val adapter = CustomAdapter(contacts , context)
+                //We call adapter
                 chatList.adapter =adapter
             }
             override fun onCancelled(p0: DatabaseError) {
@@ -116,14 +118,17 @@ class chatFragment : Fragment() {
 
 }
 
-data class ContactList(val uid:String, val name: String, val status: String, val image: String , val state:String, val date:String,val time:String){
+//We created a data class for Custom Adapter.
+data class ContactList(val uid:String, val name: String,
+                       val status: String, val image: String ,
+                       val state:String, val date:String,val time:String){
 
 
 }
 
 class CustomAdapter(val userList:ArrayList<ContactList> , val context: Context):
     RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
-
+    //In this Adapter, we will show in the ArrayList's elements using RecylerView.
     private lateinit var RootRef:DatabaseReference
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth

@@ -26,7 +26,7 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-
+        //DEFINITION
         //val register_mail = findViewById<EditText>(R.id.register_mail)
         //val register_password = findViewById<EditText>(R.id.register_password)
         val register_buton = findViewById<Button>(R.id.register_buton)

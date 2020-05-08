@@ -58,7 +58,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
         setTitle("Profile")
-
+        //DEFINITION
         val updateAccountProfile= findViewById<Button>(R.id.update_settings_button)
       //  val userName = findViewById<EditText>(R.id.set_user_name)
       //  val userStatus = findViewById<EditText>(R.id.set_profile_status)
@@ -89,7 +89,8 @@ class ProfileActivity : AppCompatActivity() {
         RetrieveUserInfo(this@ProfileActivity)
 
     }
-
+    //save user information in the firebase.
+    //These information under the User Root.
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == GalleryPick && resultCode == Activity.RESULT_OK && data != null){
@@ -177,19 +178,6 @@ class ProfileActivity : AppCompatActivity() {
                             Toast.makeText(context, "Please set & update your profile information...", Toast.LENGTH_SHORT).show();
                         }
                     }
-
-
-
-
-                        //val assetsBitmap: Bitmap? = getBitmapFromAssets(retrieveImage)
-                        //profile_image.setImageURI(retrieveImage)
-                       // profile_image.setImageBitmap(assetsBitmap)
-                        //val path = UserProfileImage.child(currentUserID)
-                        //Picasso.get().load(resultUri).resize(50, 50).centerCrop().into(profile_image)
-                        //Picasso.get().load(retrieveImage).into(set_profile_image)
-                        //Picasso.with(applicationContext).load(imageUri).into(ivBasicImage);
-                        //Glide.with(applicationContext).load(retrieveImage).into(profile_image)
-
 
             })
     }

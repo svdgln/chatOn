@@ -28,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         //val login_mail = findViewById<EditText>(R.id.login_mail)
         //val login_password = findViewById<EditText>(R.id.login_password)
+        //DEFINITION
         val login_buton = findViewById<Button>(R.id.login_buton)
         val new_account = findViewById<TextView>(R.id.new_account)
         PhoneLoginButton = findViewById(R.id.phone_login_button)
@@ -35,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         currentUser = auth.currentUser
         UserRef = FirebaseDatabase.getInstance().reference.child("Users")
-
+        //when you click new_acount buton it will be go RegisterActivity.
         new_account.setOnClickListener{
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -50,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
-
+    //When you click the login_buton it will be saved you information in the firebase with signInWithEmailAndPassword() easily.
     private fun AllowUserToLogin() {
         val mail = login_mail.text.toString()
         val password = login_password.text.toString()

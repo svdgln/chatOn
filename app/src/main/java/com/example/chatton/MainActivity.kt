@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.view, fragment)
         fragmentTransaction.commit()
     }
+    //when you open this Activity the user will be online.
     override fun onStart() {
         super.onStart()
         if (currentUser == null) {
@@ -77,7 +78,6 @@ class MainActivity : AppCompatActivity() {
             VeryUserExistance()
         }
     }
-
     override protected fun onStop() {
         super.onStop()
 
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    //OptionMenu part
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu_options, menu)
@@ -148,6 +148,7 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    //Create new group part
     private fun requestNewGroup() {
         val alert = AlertDialog.Builder(this)
         alert.setTitle("Enter Group Name: ")
