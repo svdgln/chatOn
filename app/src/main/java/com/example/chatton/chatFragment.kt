@@ -33,6 +33,7 @@ class chatFragment : Fragment() {
     private var currentUser = FirebaseAuth.getInstance().currentUser
     private lateinit var auth: FirebaseAuth
     var contacts = ArrayList<ContactList>()
+    lateinit var currentuserID:String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,9 +47,9 @@ class chatFragment : Fragment() {
         RootRef = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
         currentUser = auth.currentUser
-
-        RetrieveAndDisplayGroup(chatList,inflater.context)
-
+        if (currentUser != null) {
+            RetrieveAndDisplayGroup(chatList, inflater.context)
+        }
 
 
 
@@ -60,7 +61,9 @@ class chatFragment : Fragment() {
     private fun RetrieveAndDisplayGroup(chatList: RecyclerView, context: Context) {
         RootRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val currentuserID:String = auth.currentUser!!.uid
+
+                currentuserID = auth.currentUser!!.uid
+
                 val iterator = dataSnapshot.child("Contacts").child(currentuserID).children.iterator()
                 var ListName = ArrayList<String>()
                 var ListStatus = ArrayList<String>()

@@ -82,16 +82,13 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
 
         if (currentUser != null) {
-            updateUserStatus("offline")
+           // updateUserStatus("offline")
         }
 
     }
 
     override protected fun onDestroy() {
         super.onDestroy()
-        if (currentUser != null) {
-            updateUserStatus("offline")
-        }
     }
 
     private fun VeryUserExistance() {
@@ -206,8 +203,10 @@ class MainActivity : AppCompatActivity() {
         hashMap.put("date",saveCurrenDate)
         hashMap.put("state",state)
 
-        currentUserID = auth.currentUser!!.uid
-        RootRef.child("Users").child(currentUserID).child("userState").updateChildren(hashMap)
+        if(currentUser != null) {
+            currentUserID = auth.currentUser!!.uid
+            RootRef.child("Users").child(currentUserID).child("userState").updateChildren(hashMap)
+        }
 
 
     }

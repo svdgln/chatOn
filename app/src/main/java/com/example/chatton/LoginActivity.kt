@@ -51,6 +51,9 @@ class LoginActivity : AppCompatActivity() {
 
 
     }
+
+
+
     //When you click the login_buton it will be saved you information in the firebase with signInWithEmailAndPassword() easily.
     private fun AllowUserToLogin() {
         val mail = login_mail.text.toString()
@@ -69,17 +72,11 @@ class LoginActivity : AppCompatActivity() {
             auth.signInWithEmailAndPassword(mail,password).addOnCompleteListener ( this, OnCompleteListener<AuthResult> { task ->
                 if (task.isSuccessful) {
 
-                    val currentUserID = auth.currentUser?.uid
-                    val deviceToken = FirebaseInstanceId.getInstance().token
-                    UserRef.child(currentUserID.toString()).child("device_token").setValue(deviceToken).addOnCompleteListener(
-                        OnCompleteListener {
-                            if (task.isSuccessful){
-                                val intent = Intent(this, MainActivity::class.java)
-                                startActivity(intent)
-                                val toast = Toast.makeText(applicationContext, "Logged in Successfully ", Toast.LENGTH_LONG)
-                                toast.show()
-                            }
-                        })
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    val toast = Toast.makeText(applicationContext, "Logged in Successfully ", Toast.LENGTH_LONG)
+                    toast.show()
+
 
 
                 } else {
